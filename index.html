@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timestamp Converter</title>
+    <!-- Add Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Base Styles */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #121212; /* Dark background */
+            margin: 0;
+            padding: 20px;
+            color: #e0e0e0; /* Light text color */
+            padding-bottom: 80px; /* Add padding to avoid content overlap with the navbar */
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #1e1e1e; /* Dark container background */
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); /* Darker shadow */
+        }
+        h2 {
+            color: #ffffff; /* White heading */
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 24px; /* Larger font for desktop */
+        }
+        .input-heading,
+        .output-heading {
+            font-size: 18px;
+            color: #e0e0e0;
+            margin-bottom: 10px;
+        }
+        textarea,
+        pre {
+            width: calc(100% - 22px); /* Account for padding and border */
+            padding: 10px;
+            border: 1px solid #333; /* Darker border */
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            margin-bottom: 20px;
+            background-color: #2d2d2d; /* Dark background */
+            color: #e0e0e0; /* Light text color */
+            resize: vertical; /* Allow vertical resizing */
+            box-sizing: border-box; /* Include padding and border in width */
+        }
+        textarea {
+            height: 150px; /* Default height for textarea */
+        }
+        pre {
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            height: 150px; /* Match textarea height */
+        }
+
+        /* Navbar Styles */
+        .navbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 10px;
+            box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.3); /* Shadow for depth */
+        }
+        .navbar button {
+            background-color: #007bff; /* Blue button */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px; /* Space between icon and text */
+            flex: 1; /* Allow buttons to grow and fill space */
+            max-width: 200px; /* Limit button width */
+        }
+        .navbar button:hover {
+            background-color: #0056b3; /* Darker blue on hover */
+        }
+
+        /* Responsive Styles */
+        @media (min-width: 600px) {
+            h2 {
+                font-size: 28px; /* Larger font for desktop */
+            }
+            .input-heading,
+            .output-heading {
+                font-size: 20px; /* Larger headings on desktop */
+            }
+            textarea,
+            pre {
+                height: 200px; /* Taller textarea and pre on desktop */
+            }
+            .navbar {
+                justify-content: center; /* Center buttons on desktop */
+            }
+            .navbar button {
+                flex: none; /* Reset flex for desktop */
+                width: auto; /* Auto width for buttons on desktop */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Timestamp Converter</h2>
+
+        <!-- Input Section -->
+        <div class="input-heading">Input Timestamps</div>
+        <textarea id="input" placeholder="Enter timestamps (e.g., 0:00:00 Example)"></textarea>
+
+        <!-- Output Section -->
+        <div class="output-heading">Converted Output</div>
+        <pre id="output"></pre>
+    </div>
+
+    <!-- Navbar with Buttons -->
+    <div class="navbar">
+        <button onclick="convertTimestamps()">
+            <i class="fas fa-sync"></i> <!-- Sync icon for Convert -->
+            Convert
+        </button>
+        <button onclick="saveToFile()">
+            <i class="fas fa-download"></i> <!-- Download icon for Save -->
+            Save as .txt
+        </button>
+        <button onclick="copyOutput()">
+            <i class="fas fa-copy"></i> <!-- Copy icon for Copy Output -->
+            Copy Output
+        </button>
+    </div>
+
+    <script>
+        function convertTimestamps() {
+            let input = document.getElementById('input').value;
+            let lines = input.split('\n');
+            let output = lines.map(line => {
+                let match = line.match(/(\d+):(\d+):(\d+)\s(.+)/);
+                if (match) {
+                    let hours = parseInt(match[1], 10) * 3600;
+                    let minutes = parseInt(match[2], 10) * 60;
+                    let seconds = parseInt(match[3], 10);
+                    let totalSeconds = hours + minutes + seconds;
+                    return `${totalSeconds.toFixed(6)}\t${totalSeconds.toFixed(6)}\t${match[4]}`;
+                }
+                return '';
+            }).join('\n');
+            document.getElementById('output').textContent = output;
+            return output; // Return the converted output
+        }
+
+        function saveToFile() {
+            // Automatically convert the input before saving
+            let content = convertTimestamps();
+            let blob = new Blob([content], { type: "text/plain" });
+            let a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = "converted_timestamps.txt";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        function copyOutput() {
+            // Automatically convert the input before copying
+            let output = convertTimestamps();
+            if (output) {
+                // Use the Clipboard API to copy the text
+                navigator.clipboard.writeText(output)
+                    .then(() => {
+                        alert("Output copied to clipboard!");
+                    })
+                    .catch(() => {
+                        alert("Failed to copy output. Please try again.");
+                    });
+            } else {
+                alert("No output to copy!");
+            }
+        }
+    </script>
+</body>
+</html>
