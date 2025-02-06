@@ -14,7 +14,7 @@
             padding: 20px;
             color: #e0e0e0; /* Light text color */
             padding-bottom: 120px; /* Add padding to avoid content overlap with the toolbar */
-            background: linear-gradient(270deg, #00264d, #96caff, #0066cc);
+            background: linear-gradient(270deg, #001f3f, #003366, #004080, #00509e, #0066cc);
             background-size: 400% 400%;
             animation: GradientBackground 15s ease infinite;
         }
@@ -26,7 +26,7 @@
         .container {
             max-width: 800px;
             margin: 0 auto;
-            background: rgba(30, 30, 30, 0.7); /* Semi-transparent dark container background */
+            background: rgba(30, 30, 30, 0.8); /* Semi-transparent dark container background */
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); /* Darker shadow */
@@ -94,11 +94,12 @@
             bottom: 20px; /* Float from the bottom */
             left: 50%; /* Center horizontally */
             transform: translateX(-50%); /* Center horizontally */
-            width: fit-content; /* Float from the sides */
+            width: 90%; /* Full width on mobile */
+            max-width: 400px; /* Limit width for larger screens */
             background: rgba(255, 255, 255, 0.1); /* Semi-transparent background */
             backdrop-filter: blur(10px); /* Blur effect */
             display: flex;
-            justify-content: center;
+            flex-direction: column; /* Stack buttons vertically on mobile */
             gap: 10px;
             padding: 10px;
             border-radius: 40px; /* Rounded corners */
@@ -117,11 +118,34 @@
             align-items: center;
             justify-content: center;
             gap: 8px; /* Space between icon and text */
-            width: 120px; /* Fixed width for all buttons */
+            width: 100%; /* Full width for stacked buttons */
         }
         .toolbar button:hover {
             background-color: #0056b3; /* Darker blue on hover */
             transform: scale(1.05); /* Slight zoom effect on hover */
+        }
+
+        /* Notification Styles */
+        .notification-container {
+            position: fixed;
+            bottom: 100px; /* Position above the toolbar */
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 1000; /* Ensure notifications are on top */
+        }
+        .notification {
+            background-color: #007bff; /* Blue background */
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         /* Responsive Styles */
@@ -138,7 +162,8 @@
                 height: 200px; /* Taller textarea and pre on desktop */
             }
             .toolbar {
-                justify-content: center; /* Center buttons on desktop */
+                flex-direction: row; /* Buttons side by side on desktop */
+                width: fit-content; /* Auto width for desktop */
             }
             .toolbar button {
                 width: 140px; /* Slightly wider buttons on desktop */
@@ -152,12 +177,12 @@
 
         <!-- Toggle Button -->
         <div class="toggle-button">
-            <button id="toggleMode" onclick="toggleMode()">Switch to Seconds → Timestamps</button>
+            <button id="toggleMode" onclick="toggleMode()">Switch to Audacity Timestamps → YouTube Timestamps</button>
         </div>
 
         <!-- Input Section -->
-        <div class="input-heading">Input Timestamps</div>
-        <textarea id="input" placeholder="Enter timestamps (e.g., 0:00:00 Example)"></textarea>
+        <div class="input-heading">Input YouTube Timestamps</div>
+        <textarea id="input" placeholder="Enter YouTube timestamps (e.g., 0:00:00 Example)"></textarea>
 
         <!-- Output Section -->
         <div class="output-heading">Converted Output</div>
@@ -180,20 +205,25 @@
         </button>
     </div>
 
+    <!-- Notification Container -->
+    <div class="notification-container" id="notificationContainer"></div>
+
     <script>
-        let isTimestampToSeconds = true; // Default mode: Timestamps → Seconds
+        let isYouTubeToAudacity = true; // Default mode: YouTube Timestamps → Audacity Timestamps
 
         // Function to toggle between conversion modes
         function toggleMode() {
-            isTimestampToSeconds = !isTimestampToSeconds;
+            isYouTubeToAudacity = !isYouTubeToAudacity;
             const toggleButton = document.getElementById('toggleMode');
             const input = document.getElementById('input');
-            if (isTimestampToSeconds) {
-                toggleButton.textContent = 'Switch to Seconds → Timestamps';
-                input.placeholder = 'Enter timestamps (e.g., 0:00:00 Example)';
+            if (isYouTubeToAudacity) {
+                toggleButton.textContent = 'Switch to Audacity Timestamps → YouTube Timestamps';
+                input.placeholder = 'Enter YouTube timestamps (e.g., 0:00:00 Example)';
+                document.querySelector('.input-heading').textContent = 'Input YouTube Timestamps';
             } else {
-                toggleButton.textContent = 'Switch to Timestamps → Seconds';
-                input.placeholder = 'Enter seconds (e.g., 0.000000 0.000000 Example)';
+                toggleButton.textContent = 'Switch to YouTube Timestamps → Audacity Timestamps';
+                input.placeholder = 'Enter Audacity timestamps (e.g., 0.000000 0.000000 Example)';
+                document.querySelector('.input-heading').textContent = 'Input Audacity Timestamps';
             }
             document.getElementById('output').textContent = ''; // Clear output
         }
@@ -202,16 +232,16 @@
         function convert() {
             const input = document.getElementById('input').value;
             let output = '';
-            if (isTimestampToSeconds) {
-                output = convertTimestampsToSeconds(input);
+            if (isYouTubeToAudacity) {
+                output = convertYouTubeToAudacity(input);
             } else {
-                output = convertSecondsToTimestamps(input);
+                output = convertAudacityToYouTube(input);
             }
             document.getElementById('output').textContent = output;
         }
 
-        // Function to convert timestamps to seconds
-        function convertTimestampsToSeconds(input) {
+        // Function to convert YouTube timestamps to Audacity timestamps
+        function convertYouTubeToAudacity(input) {
             let lines = input.split('\n');
             return lines.map(line => {
                 let match = line.match(/(\d+):(\d+):(\d+)\s(.+)/);
@@ -226,8 +256,8 @@
             }).join('\n');
         }
 
-        // Function to convert seconds to timestamps
-        function convertSecondsToTimestamps(input) {
+        // Function to convert Audacity timestamps to YouTube timestamps
+        function convertAudacityToYouTube(input) {
             let lines = input.split('\n');
             return lines.map(line => {
                 let match = line.match(/(\d+\.\d+)\s(\d+\.\d+)\s(.+)/);
@@ -235,7 +265,7 @@
                     let totalSeconds = parseFloat(match[1]);
                     let hours = Math.floor(totalSeconds / 3600);
                     let minutes = Math.floor((totalSeconds % 3600) / 60);
-                    let seconds = Math.floor(totalSeconds % 60); // Remove decimal places
+                    let seconds = Math.floor(totalSeconds % 60); // Remove fractional seconds
                     return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}\t${match[3]}`;
                 }
                 return '';
@@ -258,15 +288,49 @@
         function copyOutput() {
             let output = document.getElementById('output').textContent;
             if (output) {
-                navigator.clipboard.writeText(output)
-                    .then(() => {
-                        alert("Output copied to clipboard!");
-                    })
-                    .catch(() => {
-                        alert("Failed to copy output. Please try again.");
-                    });
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(output)
+                        .then(() => {
+                            showNotification("Output copied to clipboard!");
+                        })
+                        .catch(() => {
+                            showNotification("Failed to copy output. Please try again.");
+                        });
+                } else {
+                    // Fallback for older browsers
+                    let textarea = document.createElement("textarea");
+                    textarea.value = output;
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    try {
+                        document.execCommand('copy');
+                        showNotification("Output copied to clipboard!");
+                    } catch (err) {
+                        showNotification("Failed to copy output. Please try again.");
+                    }
+                    document.body.removeChild(textarea);
+                }
             } else {
-                alert("No output to copy!");
+                showNotification("No output to copy!");
+            }
+        }
+
+        // Function to show a notification
+        function showNotification(message) {
+            const notificationContainer = document.getElementById('notificationContainer');
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+            notificationContainer.appendChild(notification);
+
+            // Remove the notification after 2 seconds
+            setTimeout(() => {
+                notification.remove();
+            }, 2000);
+
+            // Limit the number of notifications to 3
+            if (notificationContainer.children.length > 3) {
+                notificationContainer.removeChild(notificationContainer.firstChild);
             }
         }
     </script>
