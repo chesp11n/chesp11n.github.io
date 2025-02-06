@@ -128,8 +128,8 @@
         /* Notification Styles */
         .notification-container {
             position: fixed;
-            bottom: 100px; /* Position above the toolbar */
-            right: 20px;
+            top: 20px; /* Position at the top */
+            right: 20px; /* Position at the right */
             display: flex;
             flex-direction: column;
             gap: 10px;
@@ -144,7 +144,7 @@
             animation: fadeIn 0.3s ease;
         }
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
+            from { opacity: 0; transform: translateY(-20px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
@@ -164,9 +164,17 @@
             .toolbar {
                 flex-direction: row; /* Buttons side by side on desktop */
                 width: fit-content; /* Auto width for desktop */
+                border-radius: 40px; /* Rounded corners for desktop */
             }
             .toolbar button {
                 width: 140px; /* Slightly wider buttons on desktop */
+            }
+        }
+
+        /* Mobile-specific styles */
+        @media (max-width: 599px) {
+            .toolbar {
+                border-radius: 20px; /* Less rounded corners for mobile */
             }
         }
     </style>
