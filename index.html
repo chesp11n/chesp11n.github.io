@@ -136,16 +136,30 @@
             z-index: 1000; /* Ensure notifications are on top */
         }
         .notification {
-            background-color: #007bff; /* Blue background */
+            background: rgba(255, 255, 255, 0.1); /* Semi-transparent background */
+            backdrop-filter: blur(10px); /* Blur effect */
             color: white;
             padding: 10px 20px;
             border-radius: 20px;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
             animation: fadeIn 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px; /* Space between icon and text */
+        }
+        .notification.fade-out {
+            animation: fadeOut 0.3s ease forwards; /* Fade out animation */
+        }
+        .notification i {
+            font-size: 16px; /* Icon size */
         }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-20px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-20px); }
         }
 
         /* Responsive Styles */
@@ -328,12 +342,18 @@
             const notificationContainer = document.getElementById('notificationContainer');
             const notification = document.createElement('div');
             notification.className = 'notification';
-            notification.textContent = message;
+            notification.innerHTML = `
+                <i class="fas fa-bell"></i> <!-- Notification bell icon -->
+                <span>${message}</span>
+            `;
             notificationContainer.appendChild(notification);
 
             // Remove the notification after 2 seconds
             setTimeout(() => {
-                notification.remove();
+                notification.classList.add('fade-out'); // Add fade-out animation
+                setTimeout(() => {
+                    notification.remove(); // Remove the notification after animation
+                }, 300); // Match the duration of the fade-out animation
             }, 2000);
 
             // Limit the number of notifications to 3
