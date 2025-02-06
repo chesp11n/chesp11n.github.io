@@ -66,8 +66,8 @@
             bottom: 0;
             left: 0;
             width: 100%;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.1); /* Semi-transparent background */
+            backdrop-filter: blur(10px); /* Blur effect */
             display: flex;
             justify-content: center;
             gap: 10px;
@@ -79,10 +79,10 @@
             color: white;
             border: none;
             padding: 10px 20px;
-            border-radius: 20px;
+            border-radius: 20px; /* Rounded corners */
             cursor: pointer;
             font-size: 16px;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.3s ease, transform 0.2s ease;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -91,7 +91,9 @@
             max-width: 200px; /* Limit button width */
         }
         .navbar button:hover {
-            background-color: #0056b3; /* Darker blue on hover */
+            background-color: #cde5ff; /* Darker blue on hover */
+            transform: scale(1.05); /* Slight zoom effect on hover */
+            color: #000000;
         }
 
         /* Responsive Styles */
