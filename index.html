@@ -10,16 +10,23 @@
         /* Base Styles */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #121212; /* Dark background */
             margin: 0;
             padding: 20px;
             color: #e0e0e0; /* Light text color */
-            padding-bottom: 120px; /* Add padding to avoid content overlap with the navbar */
+            padding-bottom: 120px; /* Add padding to avoid content overlap with the toolbar */
+            background: linear-gradient(270deg, #003163, #96caff, #0066cc);
+            background-size: 400% 400%;
+            animation: GradientBackground 15s ease infinite;
+        }
+        @keyframes GradientBackground {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
         .container {
             max-width: 800px;
             margin: 0 auto;
-            background: #1e1e1e; /* Dark container background */
+            background: rgba(30, 30, 30, 0.8); /* Semi-transparent dark container background */
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); /* Darker shadow */
@@ -60,8 +67,29 @@
             height: 150px; /* Match textarea height */
         }
 
-        /* Navbar Styles */
-        .navbar {
+        /* Toggle Button Styles */
+        .toggle-button {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .toggle-button button {
+            background-color: #007bff; /* Blue button */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px; /* Rounded corners */
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .toggle-button button:hover {
+            background-color: #0056b3; /* Darker blue on hover */
+            transform: scale(1.05); /* Slight zoom effect on hover */
+        }
+
+        /* Toolbar Styles */
+        .toolbar {
             position: fixed;
             bottom: 20px; /* Float from the bottom */
             left: 50%; /* Center horizontally */
@@ -74,9 +102,9 @@
             gap: 10px;
             padding: 10px;
             border-radius: 40px; /* Rounded corners */
-            box-shadow: 0 -2px 2px rgba(0, 0, 0, 0.3); /* Shadow for depth */
+            box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.3); /* Shadow for depth */
         }
-        .navbar button {
+        .toolbar button {
             background-color: #007bff; /* Blue button */
             color: white;
             border: none;
@@ -89,10 +117,9 @@
             align-items: center;
             justify-content: center;
             gap: 8px; /* Space between icon and text */
-            flex: 1; /* Allow buttons to grow and fill space */
-            max-width: 200px; /* Limit button width */
+            width: 120px; /* Fixed width for all buttons */
         }
-        .navbar button:hover {
+        .toolbar button:hover {
             background-color: #0056b3; /* Darker blue on hover */
             transform: scale(1.05); /* Slight zoom effect on hover */
         }
@@ -110,12 +137,11 @@
             pre {
                 height: 200px; /* Taller textarea and pre on desktop */
             }
-            .navbar {
+            .toolbar {
                 justify-content: center; /* Center buttons on desktop */
             }
-            .navbar button {
-                flex: none; /* Reset flex for desktop */
-                width: auto; /* Auto width for buttons on desktop */
+            .toolbar button {
+                width: 140px; /* Slightly wider buttons on desktop */
             }
         }
     </style>
@@ -123,6 +149,11 @@
 <body>
     <div class="container">
         <h2>Timestamp Converter</h2>
+
+        <!-- Toggle Button -->
+        <div class="toggle-button">
+            <button id="toggleMode" onclick="toggleMode()">Switch to Seconds → Timestamps</button>
+        </div>
 
         <!-- Input Section -->
         <div class="input-heading">Input Timestamps</div>
@@ -133,9 +164,9 @@
         <pre id="output"></pre>
     </div>
 
-    <!-- Navbar with Buttons -->
-    <div class="navbar">
-        <button onclick="convertTimestamps()">
+    <!-- Toolbar with Buttons -->
+    <div class="toolbar">
+        <button onclick="convert()">
             <i class="fas fa-sync"></i> <!-- Sync icon for Convert -->
             Convert
         </button>
@@ -150,10 +181,39 @@
     </div>
 
     <script>
-        function convertTimestamps() {
-            let input = document.getElementById('input').value;
+        let isTimestampToSeconds = true; // Default mode: Timestamps → Seconds
+
+        // Function to toggle between conversion modes
+        function toggleMode() {
+            isTimestampToSeconds = !isTimestampToSeconds;
+            const toggleButton = document.getElementById('toggleMode');
+            const input = document.getElementById('input');
+            if (isTimestampToSeconds) {
+                toggleButton.textContent = 'Switch to Seconds → Timestamps';
+                input.placeholder = 'Enter timestamps (e.g., 0:00:00 Example)';
+            } else {
+                toggleButton.textContent = 'Switch to Timestamps → Seconds';
+                input.placeholder = 'Enter seconds (e.g., 0.000000 0.000000 Example)';
+            }
+            document.getElementById('output').textContent = ''; // Clear output
+        }
+
+        // Function to convert timestamps to seconds or vice versa
+        function convert() {
+            const input = document.getElementById('input').value;
+            let output = '';
+            if (isTimestampToSeconds) {
+                output = convertTimestampsToSeconds(input);
+            } else {
+                output = convertSecondsToTimestamps(input);
+            }
+            document.getElementById('output').textContent = output;
+        }
+
+        // Function to convert timestamps to seconds
+        function convertTimestampsToSeconds(input) {
             let lines = input.split('\n');
-            let output = lines.map(line => {
+            return lines.map(line => {
                 let match = line.match(/(\d+):(\d+):(\d+)\s(.+)/);
                 if (match) {
                     let hours = parseInt(match[1], 10) * 3600;
@@ -164,13 +224,27 @@
                 }
                 return '';
             }).join('\n');
-            document.getElementById('output').textContent = output;
-            return output; // Return the converted output
         }
 
+        // Function to convert seconds to timestamps
+        function convertSecondsToTimestamps(input) {
+            let lines = input.split('\n');
+            return lines.map(line => {
+                let match = line.match(/(\d+\.\d+)\s(\d+\.\d+)\s(.+)/);
+                if (match) {
+                    let totalSeconds = parseFloat(match[1]);
+                    let hours = Math.floor(totalSeconds / 3600);
+                    let minutes = Math.floor((totalSeconds % 3600) / 60);
+                    let seconds = Math.floor(totalSeconds % 60); // Remove decimal places
+                    return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}\t${match[3]}`;
+                }
+                return '';
+            }).join('\n');
+        }
+
+        // Function to save output as a .txt file
         function saveToFile() {
-            // Automatically convert the input before saving
-            let content = convertTimestamps();
+            let content = document.getElementById('output').textContent;
             let blob = new Blob([content], { type: "text/plain" });
             let a = document.createElement("a");
             a.href = URL.createObjectURL(blob);
@@ -180,11 +254,10 @@
             document.body.removeChild(a);
         }
 
+        // Function to copy output to clipboard
         function copyOutput() {
-            // Automatically convert the input before copying
-            let output = convertTimestamps();
+            let output = document.getElementById('output').textContent;
             if (output) {
-                // Use the Clipboard API to copy the text
                 navigator.clipboard.writeText(output)
                     .then(() => {
                         alert("Output copied to clipboard!");
