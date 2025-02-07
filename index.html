@@ -146,6 +146,8 @@
             display: flex;
             align-items: center;
             gap: 10px; /* Space between icon and text */
+            width: 270px;
+            min-height: 50px;
         }
         .notification.fade-out {
             animation: fadeOut 0.3s ease forwards; /* Fade out animation */
@@ -242,10 +244,12 @@
                 toggleButton.textContent = 'Switch to Audacity Timestamps → YouTube Timestamps';
                 input.placeholder = 'Enter YouTube timestamps (e.g., 0:00:00 Example)';
                 document.querySelector('.input-heading').textContent = 'Input YouTube Timestamps';
+                showNotification("Switched to YouTube Timestamps → Audacity Timestamps mode.");
             } else {
                 toggleButton.textContent = 'Switch to YouTube Timestamps → Audacity Timestamps';
                 input.placeholder = 'Enter Audacity timestamps (e.g., 0.000000 0.000000 Example)';
                 document.querySelector('.input-heading').textContent = 'Input Audacity Timestamps';
+                showNotification("Switched to Audacity Timestamps → YouTube Timestamps mode.");
             }
             document.getElementById('output').textContent = ''; // Clear output
         }
@@ -260,6 +264,13 @@
                 output = convertAudacityToYouTube(input);
             }
             document.getElementById('output').textContent = output;
+
+            // Show notification based on conversion success
+            if (output.trim()) {
+                showNotification("Conversion successful!", "success");
+            } else {
+                showNotification("Conversion failed. Please check your input.", "error");
+            }
         }
 
         // Function to convert YouTube timestamps to Audacity timestamps
@@ -297,13 +308,18 @@
         // Function to save output as a .txt file
         function saveToFile() {
             let content = document.getElementById('output').textContent;
-            let blob = new Blob([content], { type: "text/plain" });
-            let a = document.createElement("a");
-            a.href = URL.createObjectURL(blob);
-            a.download = "converted_timestamps.txt";
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
+            if (content.trim()) { // Check if there is content to save
+                let blob = new Blob([content], { type: "text/plain" });
+                let a = document.createElement("a");
+                a.href = URL.createObjectURL(blob);
+                a.download = "converted_timestamps.txt";
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                showNotification("File saved successfully!", "success"); // Success notification
+            } else {
+                showNotification("No content to save!", "error"); // Error notification
+            }
         }
 
         // Function to copy output to clipboard
@@ -313,10 +329,10 @@
                 if (navigator.clipboard) {
                     navigator.clipboard.writeText(output)
                         .then(() => {
-                            showNotification("Output copied to clipboard!");
+                            showNotification("Output copied to clipboard!", "success");
                         })
                         .catch(() => {
-                            showNotification("Failed to copy output. Please try again.");
+                            showNotification("Failed to copy output. Please try again.", "error");
                         });
                 } else {
                     // Fallback for older browsers
@@ -326,24 +342,24 @@
                     textarea.select();
                     try {
                         document.execCommand('copy');
-                        showNotification("Output copied to clipboard!");
+                        showNotification("Output copied to clipboard!", "success");
                     } catch (err) {
-                        showNotification("Failed to copy output. Please try again.");
+                        showNotification("Failed to copy output. Please try again.", "error");
                     }
                     document.body.removeChild(textarea);
                 }
             } else {
-                showNotification("No output to copy!");
+                showNotification("No output to copy!", "error");
             }
         }
 
         // Function to show a notification
-        function showNotification(message) {
+        function showNotification(message, type = "info") {
             const notificationContainer = document.getElementById('notificationContainer');
             const notification = document.createElement('div');
-            notification.className = 'notification';
+            notification.className = `notification ${type}`; // Add type for styling
             notification.innerHTML = `
-                <i class="fas fa-bell"></i> <!-- Notification bell icon -->
+                <i class="fas ${type === 'error' ? 'fa-exclamation-circle' : type === 'success' ? 'fa-check-circle' : 'fa-bell'}"></i>
                 <span>${message}</span>
             `;
             notificationContainer.appendChild(notification);
