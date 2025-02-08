@@ -147,7 +147,7 @@
             left: 50%;
             transform: translateX(-50%);
             width: 90%;
-            max-width: 400px;
+            max-width: 500px;
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
             display: flex;
@@ -361,6 +361,10 @@
                 <i class="fas fa-copy"></i>
                 Copy
             </button>
+            <button onclick="clearTimestampInputs()">
+                <i class="fas fa-trash"></i>
+                Clear
+            </button>
         </div>
         <div class="notification-container" id="timestamp-notification-container"></div>
     </div>
@@ -394,6 +398,10 @@
             <button onclick="copyMangaOutput()">
                 <i class="fas fa-copy"></i>
                 Copy
+            </button>
+            <button onclick="clearMangaInputs()">
+                <i class="fas fa-trash"></i>
+                Clear
             </button>
         </div>
         <div class="notification-container" id="manga-notification-container"></div>
@@ -521,6 +529,13 @@
             }
         }
 
+        // Clear Timestamp App Inputs
+        function clearTimestampInputs() {
+            document.getElementById('input').value = '';
+            document.getElementById('output').textContent = '';
+            showNotification("Inputs cleared!", "timestamp-notification-container", "info");
+        }
+
         // Manga App Script
         const inputs = document.querySelectorAll('#manga-app input, #manga-app textarea, #manga-app select');
         const genreButtonsContainer = document.getElementById('genre-buttons');
@@ -581,7 +596,7 @@
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `${manga.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.json`;
+                a.download = `details.json`;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
@@ -619,6 +634,21 @@
             } else {
                 showNotification("No output to copy!", "manga-notification-container", "error");
             }
+        }
+
+        // Clear Manga App Inputs
+        function clearMangaInputs() {
+            document.getElementById('title').value = '';
+            document.getElementById('author').value = '';
+            document.getElementById('artist').value = '';
+            document.getElementById('description').value = '';
+            document.getElementById('status').value = '1'; // Reset to "Ongoing"
+            selectedGenres = [];
+            document.querySelectorAll('.genre-buttons button').forEach(button => {
+                button.classList.remove('selected');
+            });
+            document.getElementById('preview').textContent = '';
+            showNotification("Inputs cleared!", "manga-notification-container", "info");
         }
 
         // Notification Function
