@@ -237,7 +237,7 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             font-size: 14px;
             margin-top: 5px;
-            background-color: #2d2d2d;
+            background-color: rgba(0, 0, 0, 0.4);
             color: #e0e0e0;
             resize: vertical;
             box-sizing: border-box;
@@ -253,7 +253,7 @@
             font-family: 'Courier New', Courier, monospace;
             font-size: 14px;
             margin-bottom: 20px;
-            background-color: #2d2d2d;
+            background-color: rgba(0, 0, 0, 0.4);
             color: #e0e0e0;
             overflow-x: auto;
             white-space: pre-wrap;
@@ -265,6 +265,30 @@
         }
         .toolbar button:hover {
             background-color: #0056b3;
+        }
+
+        /* Genre Buttons */
+        .genre-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .genre-buttons button {
+            background-color: rgba(0, 0, 0, 0.4);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            border-radius: 20px;
+        }
+        .genre-buttons button.selected {
+            background-color: #007bff;
+        }
+        .genre-buttons button:hover {
+            transform: scale(1.05);
         }
 
         /* Responsive Styles */
@@ -349,7 +373,10 @@
             <label>Author: <input type="text" id="author" autocomplete="off"></label>
             <label>Artist: <input type="text" id="artist" autocomplete="off"></label>
             <label>Description: <textarea id="description" autocomplete="off"></textarea></label>
-            <label>Genre (comma-separated): <input type="text" id="genre"></label>
+            <label>Genre:</label>
+            <div class="genre-buttons" id="genre-buttons">
+                <!-- Genre buttons will be dynamically generated here -->
+            </div>
             <label>Status: 
                 <select id="status">
                     <option value="1">Ongoing</option>
@@ -496,6 +523,30 @@
 
         // Manga App Script
         const inputs = document.querySelectorAll('#manga-app input, #manga-app textarea, #manga-app select');
+        const genreButtonsContainer = document.getElementById('genre-buttons');
+        const genres = [
+            "Action", "Adventure", "Comedy", "Drama", "Ecchi", "Fantasy", 
+            "Horror", "Mahou Shoujo", "Mecha", "Music", "Mystery", 
+            "Psychological", "Romance", "Sci-Fi", "Slice of Life", "Sports", 
+            "Supernatural", "Thriller"
+        ];
+        let selectedGenres = [];
+
+        // Generate genre buttons
+        genres.forEach(genre => {
+            const button = document.createElement('button');
+            button.textContent = genre;
+            button.addEventListener('click', () => {
+                button.classList.toggle('selected');
+                if (selectedGenres.includes(genre)) {
+                    selectedGenres = selectedGenres.filter(g => g !== genre);
+                } else {
+                    selectedGenres.push(genre);
+                }
+                updatePreview();
+            });
+            genreButtonsContainer.appendChild(button);
+        });
 
         function updatePreview() {
             const manga = {
@@ -503,7 +554,7 @@
                 author: document.getElementById('author').value,
                 artist: document.getElementById('artist').value,
                 description: document.getElementById('description').value,
-                genre: document.getElementById('genre').value.split(',').map(g => g.trim()),
+                genre: selectedGenres,
                 status: document.getElementById('status').value
             };
             const jsonOutput = JSON.stringify(manga, null, 2);
@@ -520,7 +571,7 @@
                 author: document.getElementById('author').value,
                 artist: document.getElementById('artist').value,
                 description: document.getElementById('description').value,
-                genre: document.getElementById('genre').value.split(',').map(g => g.trim()),
+                genre: selectedGenres,
                 status: document.getElementById('status').value
             };
             const jsonOutput = JSON.stringify(manga, null, 2);
