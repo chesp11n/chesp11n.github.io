@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Timestamp Converter</title>
+    <title>Multi-App Website</title>
     <!-- Add Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -11,9 +11,8 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
-            padding: 20px;
-            color: #e0e0e0; /* Light text color */
-            padding-bottom: 120px; /* Add padding to avoid content overlap with the toolbar */
+            padding: 0;
+            color: #e0e0e0;
             background: linear-gradient(270deg, #001f3f, #cbe5ff, #004080);
             background-size: 400% 400%;
             animation: GradientBackground 15s ease infinite;
@@ -23,19 +22,76 @@
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
+
+        /* Navbar Styles */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1); /* Semi-transparent background */
+            backdrop-filter: blur(10px); /* Blur effect */
+            display: flex;
+            justify-content: center;
+            padding: 10px 0;
+            z-index: 1000;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3); /* Shadow for depth */
+        }
+
+        .navbar button {
+            background: rgba(0, 0, 0, 0.4); /* Semi-transparent background */
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            border-radius: 20px; /* Rounded corners */
+            margin: 0 5px; /* Spacing between buttons */
+        }
+
+        .navbar button:hover {
+            background-color: #007bff; /* Slightly darker on hover */
+            transform: scale(1.05); /* Slight zoom effect on hover */
+        }
+
+        /* Page Styles */
+        .page {
+            display: none;
+            padding: 80px 20px 20px;
+        }
+        .page.active {
+            display: block;
+        }
+
+        /* Container Styles */
         .container {
             max-width: 800px;
             margin: 0 auto;
-            background: rgba(30, 30, 30, 0.7); /* Semi-transparent dark container background */
+            background: rgba(30, 30, 30, 0.7);
             padding: 20px;
             border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); /* Darker shadow */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
         }
-        h2 {
-            color: #ffffff; /* White heading */
+
+        /* Home Page Styles */
+        #home {
+            text-align: center;
+        }
+        #home h1 {
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+        #home p {
+            font-size: 18px;
+            line-height: 1.6;
+        }
+
+        /* Timestamp App Styles */
+        #timestamp-app h2 {
+            color: #ffffff;
             text-align: center;
             margin-bottom: 20px;
-            font-size: 24px; /* Larger font for desktop */
+            font-size: 24px;
         }
         .input-heading,
         .output-heading {
@@ -45,99 +101,93 @@
         }
         textarea,
         pre {
-            width: calc(100% - 22px); /* Account for padding and border */
+            width: calc(100% - 22px);
             padding: 10px;
-            border: 1px solid #333; /* Darker border */
+            border: 1px solid #333;
             border-radius: 10px;
             font-family: 'Courier New', Courier, monospace;
             font-size: 14px;
             margin-bottom: 20px;
-            background-color: #2d2d2d; /* Dark background */
-            color: #e0e0e0; /* Light text color */
-            resize: vertical; /* Allow vertical resizing */
-            box-sizing: border-box; /* Include padding and border in width */
+            background-color: #2d2d2d;
+            color: #e0e0e0;
+            resize: vertical;
+            box-sizing: border-box;
         }
         textarea {
-            height: 150px; /* Default height for textarea */
+            height: 150px;
         }
         pre {
             overflow-x: auto;
             white-space: pre-wrap;
             word-wrap: break-word;
-            height: 150px; /* Match textarea height */
+            height: 150px;
         }
-
-        /* Toggle Button Styles */
         .toggle-button {
             display: flex;
             justify-content: center;
             margin-bottom: 20px;
         }
         .toggle-button button {
-            background-color: #007bff; /* Blue button */
+            background-color: #007bff;
             color: white;
             border: none;
             padding: 10px 20px;
-            border-radius: 20px; /* Rounded corners */
+            border-radius: 20px;
             cursor: pointer;
             font-size: 16px;
             transition: background-color 0.3s ease, transform 0.2s ease;
         }
         .toggle-button button:hover {
-            background-color: #0056b3; /* Darker blue on hover */
-            transform: scale(1.05); /* Slight zoom effect on hover */
+            background-color: #0056b3;
+            transform: scale(1.05);
         }
-
-        /* Toolbar Styles */
         .toolbar {
             position: fixed;
-            bottom: 20px; /* Float from the bottom */
-            left: 50%; /* Center horizontally */
-            transform: translateX(-50%); /* Center horizontally */
-            width: 90%; /* Full width on mobile */
-            max-width: 400px; /* Limit width for larger screens */
-            background: rgba(255, 255, 255, 0.1); /* Semi-transparent background */
-            backdrop-filter: blur(10px); /* Blur effect */
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 400px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
             display: flex;
-            flex-direction: column; /* Stack buttons vertically on mobile */
+            flex-direction: column;
             gap: 10px;
             padding: 10px;
-            border-radius: 40px; /* Rounded corners */
-            box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.3); /* Shadow for depth */
+            border-radius: 40px;
+            box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.3);
         }
         .toolbar button {
-            background-color: #007bff; /* Blue button */
+            background-color: #007bff;
             color: white;
             border: none;
             padding: 10px 20px;
-            border-radius: 20px; /* Rounded corners */
+            border-radius: 20px;
             cursor: pointer;
             font-size: 16px;
             transition: background-color 0.3s ease, transform 0.2s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px; /* Space between icon and text */
-            width: 100%; /* Full width for stacked buttons */
+            gap: 8px;
+            width: 100%;
         }
         .toolbar button:hover {
-            background-color: #0056b3; /* Darker blue on hover */
-            transform: scale(1.05); /* Slight zoom effect on hover */
+            background-color: #0056b3;
+            transform: scale(1.05);
         }
-
-        /* Notification Styles */
         .notification-container {
             position: fixed;
-            top: 20px; /* Position at the top */
-            right: 20px; /* Position at the right */
+            top: 20px;
+            right: 20px;
             display: flex;
             flex-direction: column;
             gap: 10px;
-            z-index: 1000; /* Ensure notifications are on top */
+            z-index: 1000;
         }
         .notification {
-            background: rgba(255, 255, 255, 0.1); /* Semi-transparent background */
-            backdrop-filter: blur(10px); /* Blur effect */
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
             color: white;
             padding: 10px 20px;
             border-radius: 20px;
@@ -145,15 +195,15 @@
             animation: fadeIn 0.3s ease;
             display: flex;
             align-items: center;
-            gap: 10px; /* Space between icon and text */
+            gap: 10px;
             width: 270px;
             min-height: 50px;
         }
         .notification.fade-out {
-            animation: fadeOut 0.3s ease forwards; /* Fade out animation */
+            animation: fadeOut 0.3s ease forwards;
         }
         .notification i {
-            font-size: 16px; /* Icon size */
+            font-size: 16px;
         }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-20px); }
@@ -164,78 +214,176 @@
             to { opacity: 0; transform: translateY(-20px); }
         }
 
+        /* Manga App Styles */
+        #manga-app h2 {
+            color: #ffffff;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        label {
+            display: block;
+            margin-bottom: 15px;
+            font-size: 16px;
+            color: #e0e0e0;
+        }
+        input,
+        textarea,
+        select {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: 1px solid #333;
+            border-radius: 10px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 14px;
+            margin-top: 5px;
+            background-color: #2d2d2d;
+            color: #e0e0e0;
+            resize: vertical;
+            box-sizing: border-box;
+        }
+        textarea {
+            height: 100px;
+        }
+        pre {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: 1px solid #333;
+            border-radius: 10px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            margin-bottom: 20px;
+            background-color: #2d2d2d;
+            color: #e0e0e0;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            height: 150px;
+        }
+        .toolbar button {
+            background-color: #007bff;
+        }
+        .toolbar button:hover {
+            background-color: #0056b3;
+        }
+
         /* Responsive Styles */
         @media (min-width: 600px) {
             h2 {
-                font-size: 28px; /* Larger font for desktop */
+                font-size: 28px;
             }
             .input-heading,
             .output-heading {
-                font-size: 20px; /* Larger headings on desktop */
+                font-size: 20px;
             }
             textarea,
             pre {
-                height: 200px; /* Taller textarea and pre on desktop */
+                height: 200px;
             }
             .toolbar {
-                flex-direction: row; /* Buttons side by side on desktop */
-                width: fit-content; /* Auto width for desktop */
-                border-radius: 40px; /* Rounded corners for desktop */
+                flex-direction: row;
+                width: fit-content;
+                border-radius: 40px;
             }
             .toolbar button {
-                width: 140px; /* Slightly wider buttons on desktop */
+                width: 140px;
             }
         }
-
-        /* Mobile-specific styles */
         @media (max-width: 599px) {
             .toolbar {
-                border-radius: 20px; /* Less rounded corners for mobile */
+                border-radius: 20px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>Timestamp Converter</h2>
+    <!-- Navbar -->
+    <div class="navbar">
+        <button onclick="showPage('home')">Home</button>
+        <button onclick="showPage('timestamp-app')">Timestamp App</button>
+        <button onclick="showPage('manga-app')">Manga App</button>
+    </div>
 
-        <!-- Toggle Button -->
-        <div class="toggle-button">
-            <button id="toggleMode" onclick="toggleMode()">Switch to Audacity Timestamps → YouTube Timestamps</button>
+    <!-- Home Page -->
+    <div id="home" class="page active">
+        <div class="container">
+            <h1>Welcome to the Multi-App Website</h1>
+            <p>This website combines two useful tools: a Timestamp Converter and a Manga Details Exporter. Use the navigation bar above to switch between the apps.</p>
         </div>
-
-        <!-- Input Section -->
-        <div class="input-heading">Input YouTube Timestamps</div>
-        <textarea id="input" placeholder="Enter YouTube timestamps (e.g., 0:00:00 Example)"></textarea>
-
-        <!-- Output Section -->
-        <div class="output-heading">Converted Output</div>
-        <pre id="output"></pre>
     </div>
 
-    <!-- Toolbar with Buttons -->
-    <div class="toolbar">
-        <button onclick="convert()">
-            <i class="fas fa-sync"></i> <!-- Sync icon for Convert -->
-            Convert
-        </button>
-        <button onclick="saveToFile()">
-            <i class="fas fa-download"></i> <!-- Download icon for Save -->
-            Save
-        </button>
-        <button onclick="copyOutput()">
-            <i class="fas fa-copy"></i> <!-- Copy icon for Copy Output -->
-            Copy
-        </button>
+    <!-- Timestamp App Page -->
+    <div id="timestamp-app" class="page">
+        <div class="container">
+            <h2>Timestamp Converter</h2>
+            <div class="toggle-button">
+                <button id="toggleMode" onclick="toggleMode()">Switch to Audacity Timestamps → YouTube Timestamps</button>
+            </div>
+            <div class="input-heading">Input YouTube Timestamps</div>
+            <textarea id="input" placeholder="Enter YouTube timestamps (e.g., 0:00:00 Example)"></textarea>
+            <div class="output-heading">Converted Output</div>
+            <pre id="output"></pre>
+        </div>
+        <div class="toolbar">
+            <button onclick="convert()">
+                <i class="fas fa-sync"></i>
+                Convert
+            </button>
+            <button onclick="saveToFile()">
+                <i class="fas fa-download"></i>
+                Save
+            </button>
+            <button onclick="copyOutput()">
+                <i class="fas fa-copy"></i>
+                Copy
+            </button>
+        </div>
+        <div class="notification-container" id="timestamp-notification-container"></div>
     </div>
 
-    <!-- Notification Container -->
-    <div class="notification-container" id="notificationContainer"></div>
+    <!-- Manga App Page -->
+    <div id="manga-app" class="page">
+        <div class="container">
+            <h2>Manga Details Input</h2>
+            <label>Title: <input type="text" id="title" autocomplete="off"></label>
+            <label>Author: <input type="text" id="author" autocomplete="off"></label>
+            <label>Artist: <input type="text" id="artist" autocomplete="off"></label>
+            <label>Description: <textarea id="description" autocomplete="off"></textarea></label>
+            <label>Genre (comma-separated): <input type="text" id="genre"></label>
+            <label>Status: 
+                <select id="status">
+                    <option value="1">Ongoing</option>
+                    <option value="2">Completed</option>
+                </select>
+            </label>
+            <div class="output-heading">Preview</div>
+            <pre id="preview"></pre>
+        </div>
+        <div class="toolbar">
+            <button onclick="saveMangaToFile()">
+                <i class="fas fa-download"></i>
+                Save
+            </button>
+            <button onclick="copyMangaOutput()">
+                <i class="fas fa-copy"></i>
+                Copy
+            </button>
+        </div>
+        <div class="notification-container" id="manga-notification-container"></div>
+    </div>
 
     <script>
-        let isYouTubeToAudacity = true; // Default mode: YouTube Timestamps → Audacity Timestamps
+        // Page Navigation
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(pageId).classList.add('active');
+        }
 
-        // Function to toggle between conversion modes
+        // Timestamp App Script
+        let isYouTubeToAudacity = true;
+
         function toggleMode() {
             isYouTubeToAudacity = !isYouTubeToAudacity;
             const toggleButton = document.getElementById('toggleMode');
@@ -244,17 +392,16 @@
                 toggleButton.textContent = 'Switch to Audacity Timestamps → YouTube Timestamps';
                 input.placeholder = 'Enter YouTube timestamps (e.g., 0:00:00 Example)';
                 document.querySelector('.input-heading').textContent = 'Input YouTube Timestamps';
-                showNotification("Switched to YouTube Timestamps → Audacity Timestamps mode.");
+                showNotification("Switched to YouTube Timestamps → Audacity Timestamps mode.", "timestamp-notification-container");
             } else {
                 toggleButton.textContent = 'Switch to YouTube Timestamps → Audacity Timestamps';
                 input.placeholder = 'Enter Audacity timestamps (e.g., 0.000000 0.000000 Example)';
                 document.querySelector('.input-heading').textContent = 'Input Audacity Timestamps';
-                showNotification("Switched to Audacity Timestamps → YouTube Timestamps mode.");
+                showNotification("Switched to Audacity Timestamps → YouTube Timestamps mode.", "timestamp-notification-container");
             }
-            document.getElementById('output').textContent = ''; // Clear output
+            document.getElementById('output').textContent = '';
         }
 
-        // Function to convert timestamps to seconds or vice versa
         function convert() {
             const input = document.getElementById('input').value;
             let output = '';
@@ -265,15 +412,13 @@
             }
             document.getElementById('output').textContent = output;
 
-            // Show notification based on conversion success
             if (output.trim()) {
-                showNotification("Conversion successful!", "success");
+                showNotification("Conversion successful!", "timestamp-notification-container", "success");
             } else {
-                showNotification("Conversion failed. Please check your input.", "error");
+                showNotification("Conversion failed. Please check your input.", "timestamp-notification-container", "error");
             }
         }
 
-        // Function to convert YouTube timestamps to Audacity timestamps
         function convertYouTubeToAudacity(input) {
             let lines = input.split('\n');
             return lines.map(line => {
@@ -289,7 +434,6 @@
             }).join('\n');
         }
 
-        // Function to convert Audacity timestamps to YouTube timestamps
         function convertAudacityToYouTube(input) {
             let lines = input.split('\n');
             return lines.map(line => {
@@ -298,17 +442,16 @@
                     let totalSeconds = parseFloat(match[1]);
                     let hours = Math.floor(totalSeconds / 3600);
                     let minutes = Math.floor((totalSeconds % 3600) / 60);
-                    let seconds = Math.floor(totalSeconds % 60); // Remove fractional seconds
+                    let seconds = Math.floor(totalSeconds % 60);
                     return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}\t${match[3]}`;
                 }
                 return '';
             }).join('\n');
         }
 
-        // Function to save output as a .txt file
         function saveToFile() {
             let content = document.getElementById('output').textContent;
-            if (content.trim()) { // Check if there is content to save
+            if (content.trim()) {
                 let blob = new Blob([content], { type: "text/plain" });
                 let a = document.createElement("a");
                 a.href = URL.createObjectURL(blob);
@@ -316,67 +459,142 @@
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
-                showNotification("File saved successfully!", "success"); // Success notification
+                showNotification("File saved successfully!", "timestamp-notification-container", "success");
             } else {
-                showNotification("No content to save!", "error"); // Error notification
+                showNotification("No content to save!", "timestamp-notification-container", "error");
             }
         }
 
-        // Function to copy output to clipboard
         function copyOutput() {
             let output = document.getElementById('output').textContent;
             if (output) {
                 if (navigator.clipboard) {
                     navigator.clipboard.writeText(output)
                         .then(() => {
-                            showNotification("Output copied to clipboard!", "success");
+                            showNotification("Output copied to clipboard!", "timestamp-notification-container", "success");
                         })
                         .catch(() => {
-                            showNotification("Failed to copy output. Please try again.", "error");
+                            showNotification("Failed to copy output. Please try again.", "timestamp-notification-container", "error");
                         });
                 } else {
-                    // Fallback for older browsers
                     let textarea = document.createElement("textarea");
                     textarea.value = output;
                     document.body.appendChild(textarea);
                     textarea.select();
                     try {
                         document.execCommand('copy');
-                        showNotification("Output copied to clipboard!", "success");
+                        showNotification("Output copied to clipboard!", "timestamp-notification-container", "success");
                     } catch (err) {
-                        showNotification("Failed to copy output. Please try again.", "error");
+                        showNotification("Failed to copy output. Please try again.", "timestamp-notification-container", "error");
                     }
                     document.body.removeChild(textarea);
                 }
             } else {
-                showNotification("No output to copy!", "error");
+                showNotification("No output to copy!", "timestamp-notification-container", "error");
             }
         }
 
-        // Function to show a notification
-        function showNotification(message, type = "info") {
-            const notificationContainer = document.getElementById('notificationContainer');
+        // Manga App Script
+        const inputs = document.querySelectorAll('#manga-app input, #manga-app textarea, #manga-app select');
+
+        function updatePreview() {
+            const manga = {
+                title: document.getElementById('title').value,
+                author: document.getElementById('author').value,
+                artist: document.getElementById('artist').value,
+                description: document.getElementById('description').value,
+                genre: document.getElementById('genre').value.split(',').map(g => g.trim()),
+                status: document.getElementById('status').value
+            };
+            const jsonOutput = JSON.stringify(manga, null, 2);
+            document.getElementById('preview').textContent = jsonOutput;
+        }
+
+        inputs.forEach(input => {
+            input.addEventListener('input', updatePreview);
+        });
+
+        function saveMangaToFile() {
+            const manga = {
+                title: document.getElementById('title').value,
+                author: document.getElementById('author').value,
+                artist: document.getElementById('artist').value,
+                description: document.getElementById('description').value,
+                genre: document.getElementById('genre').value.split(',').map(g => g.trim()),
+                status: document.getElementById('status').value
+            };
+            const jsonOutput = JSON.stringify(manga, null, 2);
+
+            if (manga.title && manga.author && manga.genre.length > 0) {
+                const blob = new Blob([jsonOutput], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${manga.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showNotification("File saved successfully!", "manga-notification-container", "success");
+            } else {
+                showNotification("Please fill in all required fields.", "manga-notification-container", "error");
+            }
+        }
+
+        function copyMangaOutput() {
+            const output = document.getElementById('preview').textContent;
+            if (output) {
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(output)
+                        .then(() => {
+                            showNotification("Output copied to clipboard!", "manga-notification-container", "success");
+                        })
+                        .catch(() => {
+                            showNotification("Failed to copy output. Please try again.", "manga-notification-container", "error");
+                        });
+                } else {
+                    const textarea = document.createElement("textarea");
+                    textarea.value = output;
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    try {
+                        document.execCommand('copy');
+                        showNotification("Output copied to clipboard!", "manga-notification-container", "success");
+                    } catch (err) {
+                        showNotification("Failed to copy output. Please try again.", "manga-notification-container", "error");
+                    }
+                    document.body.removeChild(textarea);
+                }
+            } else {
+                showNotification("No output to copy!", "manga-notification-container", "error");
+            }
+        }
+
+        // Notification Function
+        function showNotification(message, containerId, type = "info") {
+            const notificationContainer = document.getElementById(containerId);
             const notification = document.createElement('div');
-            notification.className = `notification ${type}`; // Add type for styling
+            notification.className = `notification ${type}`;
             notification.innerHTML = `
                 <i class="fas ${type === 'error' ? 'fa-exclamation-circle' : type === 'success' ? 'fa-check-circle' : 'fa-bell'}"></i>
                 <span>${message}</span>
             `;
             notificationContainer.appendChild(notification);
 
-            // Remove the notification after 2 seconds
             setTimeout(() => {
-                notification.classList.add('fade-out'); // Add fade-out animation
+                notification.classList.add('fade-out');
                 setTimeout(() => {
-                    notification.remove(); // Remove the notification after animation
-                }, 300); // Match the duration of the fade-out animation
+                    notification.remove();
+                }, 300);
             }, 2000);
 
-            // Limit the number of notifications to 3
             if (notificationContainer.children.length > 3) {
                 notificationContainer.removeChild(notificationContainer.firstChild);
             }
         }
+
+        // Initialize the preview on page load
+        updatePreview();
     </script>
 </body>
 </html>
