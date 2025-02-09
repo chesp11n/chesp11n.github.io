@@ -6,6 +6,8 @@
     <title>Multi-App Website</title>
     <!-- Add Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Add JSZip for CBZ Reader -->
+    <script src="jszip.js"></script>
     <style>
         /* Base Styles */
         body {
@@ -28,7 +30,7 @@
             position: fixed;
             top: 0;
             width: 100%;
-            background: rgba(255, 255, 255, 0.1); /* Semi-transparent background */
+            background: rgba(255, 255, 255, 0.2); /* Semi-transparent background */
             backdrop-filter: blur(10px); /* Blur effect */
             display: flex;
             justify-content: center;
@@ -291,6 +293,156 @@
             transform: scale(1.05);
         }
 
+        /* CBZ Reader Styles */
+        #cbz-reader h1 {
+            color: #ffffff;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        #cbz-reader img {
+            max-width: 100%;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        #loadingBarContainer {
+            padding: 10px;
+            width: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            margin: 20px auto;
+            display: none;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+        #loadingBar {
+            height: 20px;
+            width: 0%;
+            background: #007bff;
+            transition: width 0.3s ease;
+            border-radius: 20px;
+        }
+        .progress-container {
+            margin: 20px 0;
+            text-align: center;
+        }
+        #progressBar {
+            width: 98%;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            cursor: pointer;
+            position: relative;
+            padding: 5px;
+        }
+        #progress {
+            height: 100%;
+            background: #007bff;
+            border-radius: 10px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        #pageCounter {
+            margin-top: 10px;
+            font-size: 16px;
+            color: #e0e0e0;
+        }
+        #fileInputLabel {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            display: inline-block;
+            text-align: center;
+            margin: 10px 0;
+        }
+        #fileInputLabel:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
+        #fileInputLabel.valid {
+            background-color: #28a745;
+        }
+        .toolbar {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 400px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: row;
+            gap: 10px;
+            padding: 10px;
+            border-radius: 40px;
+            box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.3);
+        }
+        .toolbar button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+        }
+        .toolbar button:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
+        .notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 1000;
+        }
+        .notification {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 270px;
+            min-height: 50px;
+        }
+        .notification.fade-out {
+            animation: fadeOut 0.3s ease forwards;
+        }
+        .notification i {
+            font-size: 16px;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-20px); }
+        }
+
         /* Responsive Styles */
         @media (min-width: 600px) {
             h2 {
@@ -326,13 +478,14 @@
         <button onclick="showPage('home')">Home</button>
         <button onclick="showPage('timestamp-app')">Timestamp App</button>
         <button onclick="showPage('manga-app')">Manga App</button>
+        <button onclick="showPage('cbz-reader')">CBZ Reader</button>
     </div>
 
     <!-- Home Page -->
     <div id="home" class="page active">
         <div class="container">
             <h1>Welcome to the Multi-App Website</h1>
-            <p>This website combines two useful tools: a Timestamp Converter and a Manga Details Exporter. Use the navigation bar above to switch between the apps.</p>
+            <p>This website combines three useful tools: a Timestamp Converter, a Manga Details Exporter, and a CBZ Reader. Use the navigation bar above to switch between the apps.</p>
         </div>
     </div>
 
@@ -405,6 +558,38 @@
             </button>
         </div>
         <div class="notification-container" id="manga-notification-container"></div>
+    </div>
+
+    <!-- CBZ Reader Page -->
+    <div id="cbz-reader" class="page">
+        <div class="container">
+            <h1>CBZ Reader</h1>
+            <label id="fileInputLabel" for="cbzInput">Choose CBZ File</label>
+            <input type="file" id="cbzInput" accept=".cbz" style="display: none;">
+            <div id="loadingBarContainer">
+                <div id="loadingBar"></div>
+            </div>
+            <br>
+            <img id="imageViewer" src="" alt="CBZ Image Viewer">
+            <!-- Progress Bar and Page Counter -->
+            <div class="progress-container">
+                <div id="progressBar">
+                    <div id="progress"></div>
+                </div>
+                <div id="pageCounter">0/0</div>
+            </div>
+        </div>
+        <div class="toolbar">
+            <button onclick="prevImage()">
+                <i class="fas fa-arrow-left"></i>
+                Previous
+            </button>
+            <button onclick="nextImage()">
+                <i class="fas fa-arrow-right"></i>
+                Next
+            </button>
+        </div>
+        <div class="notification-container" id="cbz-notification-container"></div>
     </div>
 
     <script>
@@ -651,31 +836,174 @@
             showNotification("Inputs cleared!", "manga-notification-container", "info");
         }
 
+        // CBZ Reader Script
+        let images = [];
+        let currentIndex = 0;
+        let zipInstance = null;
+        let preloadedImages = {};
+
+        // File input change handler
+        document.getElementById('cbzInput').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    JSZip.loadAsync(e.target.result).then(zip => {
+                        zipInstance = zip;
+                        images = Object.keys(zip.files).filter(name => name.match(/\.(jpg|jpeg|png|gif)$/i)).sort();
+                        if (images.length > 0) {
+                            // Reset to the first page
+                            currentIndex = 0;
+                            document.getElementById('loadingBarContainer').style.display = 'block';
+                            preloadImages();
+                            // Update file input button
+                            const fileInputLabel = document.getElementById('fileInputLabel');
+                            fileInputLabel.textContent = file.name;
+                            fileInputLabel.classList.add('valid');
+                            // Show success notification
+                            showNotification(`Import Success: ${file.name}`, "cbz-notification-container", "success");
+                            // Update page counter
+                            updatePageCounter();
+                        }
+                    });
+                };
+                reader.readAsArrayBuffer(file);
+            }
+        });
+
+        function preloadImages() {
+            preloadedImages = {};
+            let loadedCount = 0;
+            images.forEach((image, index) => {
+                zipInstance.files[image].async('blob').then(blob => {
+                    preloadedImages[index] = URL.createObjectURL(blob);
+                    loadedCount++;
+                    document.getElementById('loadingBar').style.width = (loadedCount / images.length * 100) + '%';
+                    if (loadedCount === images.length) {
+                        document.getElementById('loadingBarContainer').style.display = 'none';
+                        loadImage(currentIndex);
+                        // Initialize progress bar
+                        initializeProgressBar();
+                    }
+                });
+            });
+        }
+
+        function loadImage(index) {
+            if (preloadedImages[index]) {
+                const imageViewer = document.getElementById('imageViewer');
+                // Fade out current image
+                imageViewer.style.opacity = 0;
+                setTimeout(() => {
+                    // Change image source
+                    imageViewer.src = preloadedImages[index];
+                    // Fade in new image
+                    imageViewer.style.opacity = 1;
+                    // Update progress bar and page counter
+                    updateProgressBar(index);
+                    updatePageCounter();
+                }, 300); // Match the fade-out duration
+            }
+        }
+
+        function prevImage() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                loadImage(currentIndex);
+            }
+        }
+
+        function nextImage() {
+            if (currentIndex < images.length - 1) {
+                currentIndex++;
+                loadImage(currentIndex);
+            }
+        }
+
+        // Initialize progress bar
+        function initializeProgressBar() {
+            const progressBar = document.getElementById('progressBar');
+            progressBar.addEventListener('click', (e) => {
+                const rect = progressBar.getBoundingClientRect();
+                const clickPosition = e.clientX - rect.left;
+                const progressWidth = rect.width;
+                const newIndex = Math.floor((clickPosition / progressWidth) * images.length);
+                if (newIndex >= 0 && newIndex < images.length) {
+                    currentIndex = newIndex;
+                    loadImage(currentIndex);
+                }
+            });
+        }
+
+        // Update progress bar
+        function updateProgressBar(index) {
+            const progress = document.getElementById('progress');
+            progress.style.width = ((index + 1) / images.length * 100) + '%';
+        }
+
+        // Update page counter
+        function updatePageCounter() {
+            const pageCounter = document.getElementById('pageCounter');
+            pageCounter.textContent = `${currentIndex + 1}/${images.length}`;
+        }
+
+        // Arrow key navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') {
+                prevImage();
+            } else if (e.key === 'ArrowRight') {
+                nextImage();
+            }
+        });
+
+        // Swipe gestures for mobile devices
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.getElementById('imageViewer').addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+        });
+
+        document.getElementById('imageViewer').addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].clientX;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            const swipeThreshold = 50; // Minimum swipe distance
+            const swipeDistance = touchEndX - touchStartX;
+
+            if (swipeDistance > swipeThreshold) {
+                prevImage(); // Swipe right
+            } else if (swipeDistance < -swipeThreshold) {
+                nextImage(); // Swipe left
+            }
+        }
+
         // Notification Function
         function showNotification(message, containerId, type = "info") {
             const notificationContainer = document.getElementById(containerId);
             const notification = document.createElement('div');
-            notification.className = `notification ${type}`;
+            notification.className = `notification ${type}`; // Add type for styling
             notification.innerHTML = `
                 <i class="fas ${type === 'error' ? 'fa-exclamation-circle' : type === 'success' ? 'fa-check-circle' : 'fa-bell'}"></i>
                 <span>${message}</span>
             `;
             notificationContainer.appendChild(notification);
 
+            // Remove the notification after 2 seconds
             setTimeout(() => {
-                notification.classList.add('fade-out');
+                notification.classList.add('fade-out'); // Add fade-out animation
                 setTimeout(() => {
-                    notification.remove();
-                }, 300);
+                    notification.remove(); // Remove the notification after animation
+                }, 300); // Match the duration of the fade-out animation
             }, 2000);
 
+            // Limit the number of notifications to 3
             if (notificationContainer.children.length > 3) {
                 notificationContainer.removeChild(notificationContainer.firstChild);
             }
         }
-
-        // Initialize the preview on page load
-        updatePreview();
     </script>
 </body>
 </html>
