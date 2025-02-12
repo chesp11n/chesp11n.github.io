@@ -7,7 +7,7 @@
     <!-- Add Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- Add JSZip for CBZ Reader -->
-    <script src="jszip.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
         /* Base Styles */
         body {
@@ -494,6 +494,7 @@
         <button onclick="showPage('timestamp-app')">Timestamp App</button>
         <button onclick="showPage('manga-app')">Manga App</button>
         <button onclick="showPage('cbz-reader')">CBZ Reader</button>
+        <button onclick="showPage('base64-decoder')">Base64 Decoder</button>
     </div>
 
     <!-- Home Page -->
@@ -605,6 +606,28 @@
             </button>
         </div>
         <div class="notification-container" id="cbz-notification-container"></div>
+    </div>
+
+    <!-- Base64 Decoder Page -->
+    <div id="base64-decoder" class="page">
+        <div class="container">
+            <h2>Base64 Decoder</h2>
+            <label for="base64Input">Enter Base64 Encoded String:</label>
+            <input type="text" id="base64Input" placeholder="Enter Base64 string here">
+            <h3>Decoded Text:</h3>
+            <textarea id="decodedOutput" readonly placeholder="Decoded text will appear here..."></textarea>
+        </div>
+        <div class="toolbar">
+            <button onclick="decodeBase64()">
+                <i class="fas fa-code"></i>
+                Decode
+            </button>
+            <button onclick="clearBase64Inputs()">
+                <i class="fas fa-trash"></i>
+                Clear
+            </button>
+        </div>
+        <div class="notification-container" id="base64-notification-container"></div>
     </div>
 
     <script>
@@ -993,6 +1016,25 @@
             } else if (swipeDistance < -swipeThreshold) {
                 nextImage(); // Swipe left
             }
+        }
+        
+        // Base64 Decoder Script
+        function decodeBase64() {
+            const base64Input = document.getElementById('base64Input').value;
+            try {
+                const decodedText = atob(base64Input);
+                document.getElementById('decodedOutput').value = decodedText;
+                showNotification("Decoding successful!", "base64-notification-container", "success");
+            } catch (e) {
+                document.getElementById('decodedOutput').value = 'Invalid Base64 string';
+                showNotification("Decoding failed. Please check your input.", "base64-notification-container", "error");
+            }
+        }
+
+        function clearBase64Inputs() {
+            document.getElementById('base64Input').value = '';
+            document.getElementById('decodedOutput').value = '';
+            showNotification("Inputs cleared!", "base64-notification-container", "info");
         }
 
         // Notification Function
