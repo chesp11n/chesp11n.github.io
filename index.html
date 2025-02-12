@@ -510,7 +510,7 @@
         <div class="container">
             <h2>Timestamp Converter</h2>
             <div class="toggle-button">
-                <button id="toggleMode" onclick="toggleMode()">Switch to Audacity Timestamps → YouTube Timestamps</button>
+                <button id="toggleTimestampMode" onclick="toggleTimestampMode()">Switch to Audacity Timestamps → YouTube Timestamps</button>
             </div>
             <div class="input-heading">Input YouTube Timestamps</div>
             <textarea id="input" placeholder="Enter YouTube timestamps (e.g., 0:00:00 Example)"></textarea>
@@ -608,19 +608,22 @@
         <div class="notification-container" id="cbz-notification-container"></div>
     </div>
 
-    <!-- Base64 Decoder Page -->
+    <!-- Base64 Decoder/Encoder Page -->
     <div id="base64-decoder" class="page">
         <div class="container">
-            <h2>Base64 Decoder</h2>
-            <label for="base64Input">Enter Base64 Encoded String:</label>
+            <h2>Base64 Decoder/Encoder</h2>
+            <div class="toggle-button">
+                <button id="toggleBase64Mode" onclick="toggleBase64Mode()">Switch to Encode Mode</button>
+            </div>
+            <label id="inputLabel" for="base64Input">Enter Base64 Encoded String:</label>
             <input type="text" id="base64Input" placeholder="Enter Base64 string here">
-            <h3>Decoded Text:</h3>
+            <h3 id="outputLabel">Decoded Text:</h3>
             <textarea id="decodedOutput" readonly placeholder="Decoded text will appear here..."></textarea>
         </div>
         <div class="toolbar">
-            <button onclick="decodeBase64()">
+            <button onclick="processBase64()">
                 <i class="fas fa-code"></i>
-                Decode
+                <span id="processButtonText">Decode</span>
             </button>
             <button onclick="clearBase64Inputs()">
                 <i class="fas fa-trash"></i>
@@ -642,9 +645,9 @@
         // Timestamp App Script
         let isYouTubeToAudacity = true;
 
-        function toggleMode() {
+        function toggleTimestampMode() {
             isYouTubeToAudacity = !isYouTubeToAudacity;
-            const toggleButton = document.getElementById('toggleMode');
+            const toggleButton = document.getElementById('toggleTimestampMode');
             const input = document.getElementById('input');
             if (isYouTubeToAudacity) {
                 toggleButton.textContent = 'Switch to Audacity Timestamps → YouTube Timestamps';
@@ -1018,16 +1021,58 @@
             }
         }
         
-        // Base64 Decoder Script
-        function decodeBase64() {
-            const base64Input = document.getElementById('base64Input').value;
-            try {
-                const decodedText = atob(base64Input);
-                document.getElementById('decodedOutput').value = decodedText;
-                showNotification("Decoding successful!", "base64-notification-container", "success");
-            } catch (e) {
-                document.getElementById('decodedOutput').value = 'Invalid Base64 string';
-                showNotification("Decoding failed. Please check your input.", "base64-notification-container", "error");
+        // Base64 Decoder/Encoder Script
+        let isDecodeMode = true;
+
+        function toggleBase64Mode() {
+            isDecodeMode = !isDecodeMode;
+            const toggleButton = document.getElementById('toggleBase64Mode');
+            const inputLabel = document.getElementById('inputLabel');
+            const outputLabel = document.getElementById('outputLabel');
+            const processButtonText = document.getElementById('processButtonText');
+
+            if (isDecodeMode) {
+                toggleButton.textContent = 'Switch to Encode Mode';
+                inputLabel.textContent = 'Enter Base64 Encoded String:';
+                outputLabel.textContent = 'Decoded Text:';
+                processButtonText.textContent = 'Decode';
+                document.getElementById('base64Input').placeholder = 'Enter Base64 string here';
+                document.getElementById('decodedOutput').placeholder = 'Decoded text will appear here...';
+                showNotification("Switched to Decode mode.", "base64-notification-container");
+            } else {
+                toggleButton.textContent = 'Switch to Decode Mode';
+                inputLabel.textContent = 'Enter Text to Encode:';
+                outputLabel.textContent = 'Encoded Base64:';
+                processButtonText.textContent = 'Encode';
+                document.getElementById('base64Input').placeholder = 'Enter text to encode here';
+                document.getElementById('decodedOutput').placeholder = 'Encoded Base64 will appear here...';
+                showNotification("Switched to Encode mode.", "base64-notification-container");
+            }
+            clearBase64Inputs();
+        }
+
+        function processBase64() {
+            const input = document.getElementById('base64Input').value;
+            const outputField = document.getElementById('decodedOutput');
+
+            if (isDecodeMode) {
+                try {
+                    const decodedText = atob(input);
+                    outputField.value = decodedText;
+                    showNotification("Decoding successful!", "base64-notification-container", "success");
+                } catch (e) {
+                    outputField.value = 'Invalid Base64 string';
+                    showNotification("Decoding failed. Please check your input.", "base64-notification-container", "error");
+                }
+            } else {
+                try {
+                    const encodedText = btoa(input);
+                    outputField.value = encodedText;
+                    showNotification("Encoding successful!", "base64-notification-container", "success");
+                } catch (e) {
+                    outputField.value = 'Invalid input for encoding';
+                    showNotification("Encoding failed. Please check your input.", "base64-notification-container", "error");
+                }
             }
         }
 
