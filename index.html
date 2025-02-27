@@ -74,6 +74,76 @@
             color: white; /* Ensure text is visible */
         }
 
+        /* Home Screen */
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            min-height: 300px; /* Fixed minimum height for all cards */
+        }
+
+        .card-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h3 {
+            color: #fff;
+            margin: 0 0 15px 0;
+            font-size: 1.5em;
+        }
+
+        .card p {
+            color: #e0e0e0;
+            font-size: 1em;
+            margin-bottom: 20px;
+            flex: 1; /* Makes paragraph take available space */
+        }
+
+
+        .card button {
+            margin-top: auto; /* Pushes button to bottom */
+            background: rgba(0, 123, 255, 0.8);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: fit-content;
+            align-self: center; /* Center button horizontally */
+        }
+
+        .card button:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
+
+        /* Update the home container */
+        #home .container {
+            max-width: 1200px;
+            padding: 40px 20px;
+        }
+
         /* Page Styles */
         .page {
             display: none;
@@ -395,6 +465,50 @@
         #fileInputLabel.valid {
             background-color: #28a745;
         }
+
+        /* Text Replacement App Styles */
+        #text-replacement-app .input-group {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        #text-replacement-app label {
+            color: #e0e0e0;
+            font-size: 16px;
+        }
+
+        #text-replacement-app input {
+            width: 100%;
+            padding: 8px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: #e0e0e0;
+        }
+
+        .editor-box {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 15px;
+            min-height: 200px;
+            max-height: 500px;
+            overflow-y: auto;
+            color: #e0e0e0;
+            white-space: pre-wrap;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        .highlight {
+            background-color: #ffd700;
+            color: #000;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
         .toolbar {
             position: fixed;
             bottom: 20px;
@@ -513,13 +627,50 @@
         <button onclick="showPage('manga-app')">Manga App</button>
         <button onclick="showPage('cbz-reader')">CBZ Reader</button>
         <button onclick="showPage('base64-decoder')">Base64 Decoder</button>
+        <button onclick="showPage('text-replacement-app')">Text Replacement</button>
     </div>
 
     <!-- Home Page -->
     <div id="home" class="page active">
         <div class="container">
             <h1>Welcome to the Multi-App Website</h1>
-            <p>This website combines three useful tools: a Timestamp Converter, a Manga Details Exporter, and a CBZ Reader. Use the navigation bar above to switch between the apps.</p>
+            <div class="card-container">
+                <div class="card">
+                    <div class="card-content">
+                        <h3>Timestamp Converter</h3>
+                        <p>Convert between YouTube and Audacity timestamp formats quickly and easily.</p>
+                        <button onclick="showPage('timestamp-app')">Open App</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-content">
+                        <h3>Manga Exporter</h3>
+                        <p>Create and export manga metadata in JSON format with genre tagging.</p>
+                        <button onclick="showPage('manga-app')">Open App</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-content">
+                        <h3>CBZ Reader</h3>
+                        <p>Read comic book archives directly in your browser with smooth navigation.</p>
+                        <button onclick="showPage('cbz-reader')">Open App</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-content">
+                        <h3>Base64 Tool</h3>
+                        <p>Encode and decode Base64 strings with real-time preview.</p>
+                        <button onclick="showPage('base64-decoder')">Open App</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-content">
+                        <h3>Text Replacement</h3>
+                        <p>Find and replace text in real-time with highlighted matches.</p>
+                        <button onclick="showPage('text-replacement-app')">Open App</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -597,7 +748,7 @@
     <!-- CBZ Reader Page -->
     <div id="cbz-reader" class="page">
         <div class="container">
-            <h1>CBZ Reader</h1>
+            <h2>CBZ Reader</h2>
             <label id="fileInputLabel" for="cbzInput">Choose CBZ File</label>
             <input type="file" id="cbzInput" accept=".cbz" style="display: none;">
             <div id="loadingBarContainer">
@@ -649,6 +800,34 @@
             </button>
         </div>
         <div class="notification-container" id="base64-notification-container"></div>
+    </div>
+
+    <!-- Text Replacement App Page -->
+    <div id="text-replacement-app" class="page">
+        <div class="container">
+            <h2>Text Replacement Tool</h2>
+            <label>Find: <input type="text" id="searchText" autocomplete="off" oninput="renameText()"></label>
+            <label>Replace with: <input type="text" id="replaceText" autocomplete="off" oninput="renameText()"></label>
+            <div>
+                <h3>Input Text:</h3>
+                <div id="inputContainer" class="editor-box" contenteditable="true" oninput="renameText()"></div>
+            </div>
+            <div>
+                <h3>Updated Text:</h3>
+                <div id="outputText" class="editor-box"></div>
+            </div>
+        </div>
+        <div class="toolbar">
+            <button onclick="copyReplacementOutput()">
+                <i class="fas fa-copy"></i>
+                Copy
+            </button>
+            <button onclick="clearReplacementInputs()">
+                <i class="fas fa-trash"></i>
+                Clear
+            </button>
+        </div>
+        <div class="notification-container" id="replacement-notification-container"></div>
     </div>
 
     <script>
@@ -1112,6 +1291,94 @@
             document.getElementById('base64Input').value = '';
             document.getElementById('decodedOutput').value = '';
             showNotification("Inputs cleared!", "base64-notification-container", "info");
+        }
+
+        // Text Replacement App Script
+        function escapeRegExp(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
+        function renameText() {
+            // Store currently focused element
+            const activeElement = document.activeElement;
+            
+            let inputContainer = document.getElementById("inputContainer");
+            let searchText = document.getElementById("searchText").value;
+            let replaceText = document.getElementById("replaceText").value;
+            let outputDiv = document.getElementById("outputText");
+            
+            // Get raw text without HTML tags for processing
+            let rawText = inputContainer.innerText;
+            
+            if (searchText) {
+                let escapedSearchText = escapeRegExp(searchText);
+                let regex = new RegExp(escapedSearchText, 'gi');
+                
+                // Process highlighted text
+                let highlightedText = rawText.replace(regex, match => `<span class='highlight'>${match}</span>`);
+                let replacedText = rawText.replace(regex, replaceText);
+                
+                // Update containers while preserving cursor position
+                preserveCursorPosition(inputContainer, () => {
+                    inputContainer.innerHTML = highlightedText;
+                });
+                outputDiv.textContent = replacedText;
+            } else {
+                preserveCursorPosition(inputContainer, () => {
+                    inputContainer.innerHTML = rawText;
+                });
+                outputDiv.textContent = rawText;
+            }
+            
+            // Restore focus to original element if it was a search input
+            if (activeElement && (activeElement.id === 'searchText' || activeElement.id === 'replaceText')) {
+                activeElement.focus();
+            }
+        }
+
+        function restoreSelection(element, startOffset, endOffset) {
+            const range = document.createRange();
+            const sel = window.getSelection();
+            range.setStart(element.firstChild || element, startOffset);
+            range.setEnd(element.firstChild || element, endOffset);
+            sel.removeAllRanges();
+            sel.addRange(range);
+        }
+
+        function preserveCursorPosition(editableDiv, callback) {
+            const selection = window.getSelection();
+            const range = selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
+            const startOffset = range ? range.startOffset : 0;
+            const endOffset = range ? range.endOffset : 0;
+            
+            callback();
+            
+            if (range) {
+                const newRange = document.createRange();
+                const textNode = editableDiv.childNodes[0] || document.createTextNode('');
+                newRange.setStart(textNode, Math.min(startOffset, textNode.length));
+                newRange.setEnd(textNode, Math.min(endOffset, textNode.length));
+                selection.removeAllRanges();
+                selection.addRange(newRange);
+            }
+        }
+
+        function copyReplacementOutput() {
+            let output = document.getElementById('outputText').textContent;
+            if (output) {
+                navigator.clipboard.writeText(output)
+                    .then(() => showNotification("Output copied!", "replacement-notification-container", "success"))
+                    .catch(() => showNotification("Failed to copy", "replacement-notification-container", "error"));
+            } else {
+                showNotification("No output to copy", "replacement-notification-container", "error");
+            }
+        }
+
+        function clearReplacementInputs() {
+            document.getElementById('inputContainer').innerHTML = '';
+            document.getElementById('outputText').innerHTML = '';
+            document.getElementById('searchText').value = '';
+            document.getElementById('replaceText').value = '';
+            showNotification("Cleared all inputs", "replacement-notification-container", "info");
         }
 
         // Notification Function
