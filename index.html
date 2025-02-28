@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- Add JSZip for CBZ Reader -->
     <script src="jszip.js"></script>
+    <!-- Add Qr Code Reader Functionality -->
+    <script src="qrcode.js"></script>
     <style>
         /* Base Styles */
         body {
@@ -509,6 +511,31 @@
             border-radius: 3px;
         }
 
+        /* QR Code App Styles */
+        #qr-code-app input {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: 1px solid #333;
+            border-radius: 10px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 14px;
+            margin-bottom: 20px;
+            background-color: rgba(0, 0, 0, 0.4);
+            color: #e0e0e0;
+        }
+
+        #qrcode {
+            margin: 20px auto;
+            max-width: 256px;
+            background: white;
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        #qrcode img {
+            margin: 0 auto;
+        }
+
         .toolbar {
             position: fixed;
             bottom: 20px;
@@ -628,6 +655,7 @@
         <button onclick="showPage('cbz-reader')">CBZ Reader</button>
         <button onclick="showPage('base64-decoder')">Base64 Decoder</button>
         <button onclick="showPage('text-replacement-app')">Text Replacement</button>
+        <button onclick="showPage('qr-code-app')">Text to QR Code</button>
     </div>
 
     <!-- Home Page -->
@@ -668,6 +696,13 @@
                         <h3>Text Replacement</h3>
                         <p>Find and replace text in real-time with highlighted matches.</p>
                         <button onclick="showPage('text-replacement-app')">Open App</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-content">
+                        <h3>QR Code Generator</h3>
+                        <p>Generate custom QR codes from text or URLs instantly.</p>
+                        <button onclick="showPage('qr-code-app')">Open App</button>
                     </div>
                 </div>
             </div>
@@ -828,6 +863,30 @@
             </button>
         </div>
         <div class="notification-container" id="replacement-notification-container"></div>
+    </div>
+
+    <!-- QR Code Generator Page -->
+    <div id="qr-code-app" class="page">
+        <div class="container">
+            <h2>QR Code Generator</h2>
+            <input type="text" id="qr-text" placeholder="Enter text or URL..." />
+            <div id="qrcode"></div>
+        </div>
+        <div class="toolbar">
+            <button onclick="generateQRCode()">
+                <i class="fas fa-qrcode"></i>
+                Generate
+            </button>
+            <button onclick="downloadQRCode()">
+                <i class="fas fa-download"></i>
+                Download
+            </button>
+            <button onclick="clearQRInput()">
+                <i class="fas fa-trash"></i>
+                Clear
+            </button>
+        </div>
+        <div class="notification-container" id="qr-notification-container"></div>
     </div>
 
     <script>
@@ -1379,6 +1438,56 @@
             document.getElementById('searchText').value = '';
             document.getElementById('replaceText').value = '';
             showNotification("Cleared all inputs", "replacement-notification-container", "info");
+        }
+
+        // QR Code Generator Script
+        let qrCodeInstance = null;
+
+        function generateQRCode() {
+            const text = document.getElementById('qr-text').value;
+            if (!text) {
+                showNotification("Please enter some text", "qr-notification-container", "error");
+                return;
+            }
+            
+            // Clear previous QR code
+            if (qrCodeInstance) {
+                qrCodeInstance.clear();
+                document.getElementById('qrcode').innerHTML = '';
+            }
+            
+            qrCodeInstance = new QRCode(document.getElementById('qrcode'), {
+                text: text,
+                width: 256,
+                height: 256,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+            
+            showNotification("QR Code generated!", "qr-notification-container", "success");
+        }
+
+        function downloadQRCode() {
+            const qrImage = document.getElementById('qrcode').querySelector('img');
+            if (qrImage) {
+                const link = document.createElement('a');
+                link.download = 'qrcode.png';
+                link.href = qrImage.src;
+                link.click();
+                showNotification("QR Code downloaded!", "qr-notification-container", "success");
+            } else {
+                showNotification("No QR Code to download", "qr-notification-container", "error");
+            }
+        }
+
+        function clearQRInput() {
+            document.getElementById('qr-text').value = '';
+            if (qrCodeInstance) {
+                qrCodeInstance.clear();
+                document.getElementById('qrcode').innerHTML = '';
+            }
+            showNotification("Input cleared", "qr-notification-container", "info");
         }
 
         // Notification Function
