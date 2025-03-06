@@ -182,12 +182,6 @@
         }
 
         /* Timestamp App Styles */
-        #timestamp-app h2 {
-            color: #ffffff;
-            text-align: center;
-            margin-bottom: 20px;
-            font-size: 24px;
-        }
         .input-heading,
         .output-heading {
             font-size: 18px;
@@ -299,7 +293,39 @@
             gap: 10px;
             width: 270px;
             min-height: 50px;
+            position: relative; /* Add this for positioning the progress bar */
+            padding-bottom: 8px; /* Add space for the progress bar */
+            overflow: hidden;
         }
+
+        .notification-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 5px; /* Increased thickness */
+            background: rgba(255, 255, 255, 0.3); /* Softer background */
+            overflow: hidden;
+            border-radius: 0 0 20px 20px; /* Match notification's border radius */
+        }
+
+        .notification-progress::after {
+            content: '';
+            display: block;
+            height: 100%;
+            width: 100%;
+            background: #007bff; /* Use theme color */
+            animation: progress 2s linear forwards;
+            transform-origin: right center; /* Changed transform origin */
+            border-radius: 10px; /* Adjusted border radius */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        @keyframes progress {
+            from { transform: scaleX(1); }
+            to { transform: scaleX(0); }
+        }
+
         .notification.fade-out {
             animation: fadeOut 0.3s ease forwards;
         }
@@ -316,12 +342,6 @@
         }
 
         /* Manga App Styles */
-        #manga-app h2 {
-            color: #ffffff;
-            text-align: center;
-            margin-bottom: 20px;
-            font-size: 24px;
-        }
         label {
             display: block;
             margin-bottom: 15px;
@@ -393,12 +413,6 @@
         }
 
         /* CBZ Reader Styles */
-        #cbz-reader h1 {
-            color: #ffffff;
-            text-align: center;
-            margin-bottom: 20px;
-            font-size: 24px;
-        }
         #cbz-reader img {
             max-width: 100%;
             margin: 20px 0;
@@ -408,7 +422,6 @@
             transition: opacity 0.5s ease;
         }
         #loadingBarContainer {
-            padding: 10px;
             width: 50%;
             background: rgba(255, 255, 255, 0.2);
             backdrop-filter: blur(10px);
@@ -435,7 +448,7 @@
             border-radius: 20px;
             cursor: pointer;
             position: relative;
-            padding: 5px;
+            overflow: hidden;
         }
         #progress {
             height: 100%;
@@ -514,6 +527,12 @@
         }
 
         /* QR Code App Styles */
+
+        .qrplaceholder {
+            height: 256px;
+            width: 256px;
+        }
+
         #qr-code-app input {
             width: calc(100% - 22px);
             padding: 10px;
@@ -873,7 +892,7 @@
         <div class="container">
             <h2>QR Code Generator</h2>
             <input type="text" id="qr-text" placeholder="Enter text or URL..." />
-            <div id="qrcode"></div>
+            <div id="qrcode"><div class="qrplaceholder"></div></div>
         </div>
         <div class="toolbar">
             <button onclick="generateQRCode()">
@@ -893,6 +912,10 @@
     </div>
 
     <script>
+        // Initialize the home page as active when the document loads
+        document.addEventListener('DOMContentLoaded', function() {
+            showPage('home'); // This will activate both the page and the navbar button
+        });
         // Page Navigation
         function showPage(pageId) {
             // Hide all pages
@@ -1448,6 +1471,7 @@
 
         function generateQRCode() {
             const text = document.getElementById('qr-text').value;
+            document.getElementById('qrcode').innerHTML = '';
             if (!text) {
                 showNotification("Please enter some text", "qr-notification-container", "error");
                 return;
@@ -1488,31 +1512,33 @@
             document.getElementById('qr-text').value = '';
             if (qrCodeInstance) {
                 qrCodeInstance.clear();
-                document.getElementById('qrcode').innerHTML = '';
+                document.getElementById('qrcode').innerHTML = '<div class="qrplaceholder"></div>';
             }
             showNotification("Input cleared", "qr-notification-container", "info");
         }
 
         // Notification Function
+        // Modified the showNotification function to include the progress bar
         function showNotification(message, containerId, type = "info") {
             const notificationContainer = document.getElementById(containerId);
             const notification = document.createElement('div');
-            notification.className = `notification ${type}`; // Add type for styling
+            notification.className = `notification ${type}`;
             notification.innerHTML = `
                 <i class="fas ${type === 'error' ? 'fa-exclamation-circle' : type === 'success' ? 'fa-check-circle' : 'fa-bell'}"></i>
                 <span>${message}</span>
+                <div class="notification-progress"></div>
             `;
             notificationContainer.appendChild(notification);
 
             // Remove the notification after 2 seconds
             setTimeout(() => {
-                notification.classList.add('fade-out'); // Add fade-out animation
+                notification.classList.add('fade-out');
                 setTimeout(() => {
-                    notification.remove(); // Remove the notification after animation
-                }, 300); // Match the duration of the fade-out animation
+                    notification.remove();
+                }, 300);
             }, 2000);
 
-            // Limit the number of notifications to 3
+            // Limit notifications to 3
             if (notificationContainer.children.length > 3) {
                 notificationContainer.removeChild(notificationContainer.firstChild);
             }
