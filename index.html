@@ -32,14 +32,15 @@
             position: fixed;
             top: 0;
             width: 100%;
-            background: rgba(255, 255, 255, 0.2); /* Semi-transparent background */
-            backdrop-filter: blur(10px); /* Blur effect */
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
             display: flex;
-            overflow-x: auto; /* Enable horizontal scrolling */
-            white-space: nowrap; /* Prevent buttons from wrapping to the next line */
+            overflow-x: auto;
+            white-space: nowrap;
             padding: 10px 0;
             z-index: 1000;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3); /* Shadow for depth */
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+            scroll-behavior: smooth;
         }
 
         .navbar button {
@@ -61,9 +62,7 @@
         }
 
         /* Hide scrollbar for a cleaner look */
-        .navbar::-webkit-scrollbar {
-            display: none;
-        }
+        
 
         .navbar {
             -ms-overflow-style: none; /* IE and Edge */
@@ -483,51 +482,7 @@
             background-color: #28a745;
         }
 
-        /* Text Replacement App Styles */
-        #text-replacement-app .input-group {
-            display: grid;
-            grid-template-columns: auto 1fr;
-            gap: 10px;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        #text-replacement-app label {
-            color: #e0e0e0;
-            font-size: 16px;
-        }
-
-        #text-replacement-app input {
-            width: 100%;
-            padding: 8px;
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid #333;
-            border-radius: 8px;
-            color: #e0e0e0;
-        }
-
-        .editor-box {
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid #333;
-            border-radius: 8px;
-            padding: 15px;
-            min-height: 200px;
-            max-height: 500px;
-            overflow-y: auto;
-            color: #e0e0e0;
-            white-space: pre-wrap;
-            font-family: 'Courier New', Courier, monospace;
-        }
-
-        .highlight {
-            background-color: #ffd700;
-            color: #000;
-            padding: 2px 4px;
-            border-radius: 3px;
-        }
-
         /* QR Code App Styles */
-
         .qrplaceholder {
             height: 256px;
             width: 256px;
@@ -556,6 +511,76 @@
         #qrcode img {
             margin: 0 auto;
         }
+
+        /* Text Replacer Styles */
+        .input-group {
+            display: flex;
+            gap: 10px;
+            width: calc(100% - 22px);
+        }
+
+        .case-sensitive {
+            margin: 15px 0;
+            width: calc(100% - 22px);
+        
+        }
+
+        .case-sensitive label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            color: #e0e0e0;
+            font-size: 14px;
+            padding: 8px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .case-sensitive label:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .case-sensitive input[type="checkbox"] {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #007bff;
+            border-radius: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .case-sensitive input[type="checkbox"]:checked {
+            background: #007bff;
+            border-color: #007bff;
+        }
+
+        .case-sensitive input[type="checkbox"]:checked::after {
+            content: '✓';
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .case-sensitive input[type="checkbox"]:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.3);
+        }
+
+        .highlight {
+            background-color: #007bff;
+            transition: background-color 0.5s ease-in-out;
+        }
+
 
         .toolbar {
             position: fixed;
@@ -676,8 +701,8 @@
         <button onclick="showPage('manga-app')">Manga App</button>
         <button onclick="showPage('cbz-reader')">CBZ Reader</button>
         <button onclick="showPage('base64-decoder')">Base64 Decoder</button>
-        <button onclick="showPage('text-replacement-app')">Text Replacement</button>
         <button onclick="showPage('qr-code-app')">Text to QR Code</button>
+        <button onclick="showPage('text-replacement-app')">Find and Replace Text</button>
     </div>
 
     <!-- Home Page -->
@@ -715,16 +740,16 @@
                 </div>
                 <div class="card">
                     <div class="card-content">
-                        <h3>Text Replacement</h3>
-                        <p>Find and replace text in real-time with highlighted matches.</p>
-                        <button onclick="showPage('text-replacement-app')">Open App</button>
+                        <h3>QR Code Generator</h3>
+                        <p>Generate custom QR codes from text or URLs instantly.</p>
+                        <button onclick="showPage('qr-code-app')">Open App</button>
                     </div>
                 </div>
                 <div class="card">
                     <div class="card-content">
-                        <h3>QR Code Generator</h3>
-                        <p>Generate custom QR codes from text or URLs instantly.</p>
-                        <button onclick="showPage('qr-code-app')">Open App</button>
+                        <h3>Find and Replace Text</h3>
+                        <p>Find and replace text with real-time highlighting and file support.</p>
+                        <button onclick="showPage('text-replacement-app')">Open App</button>
                     </div>
                 </div>
             </div>
@@ -859,34 +884,6 @@
         <div class="notification-container" id="base64-notification-container"></div>
     </div>
 
-    <!-- Text Replacement App Page -->
-    <div id="text-replacement-app" class="page">
-        <div class="container">
-            <h2>Text Replacement Tool</h2>
-            <label>Find: <input type="text" id="searchText" autocomplete="off" oninput="renameText()"></label>
-            <label>Replace with: <input type="text" id="replaceText" autocomplete="off" oninput="renameText()"></label>
-            <div>
-                <h3>Input Text:</h3>
-                <div id="inputContainer" class="editor-box" contenteditable="true" oninput="renameText()"></div>
-            </div>
-            <div>
-                <h3>Updated Text:</h3>
-                <div id="outputText" class="editor-box"></div>
-            </div>
-        </div>
-        <div class="toolbar">
-            <button onclick="copyReplacementOutput()">
-                <i class="fas fa-copy"></i>
-                Copy
-            </button>
-            <button onclick="clearReplacementInputs()">
-                <i class="fas fa-trash"></i>
-                Clear
-            </button>
-        </div>
-        <div class="notification-container" id="replacement-notification-container"></div>
-    </div>
-
     <!-- QR Code Generator Page -->
     <div id="qr-code-app" class="page">
         <div class="container">
@@ -911,6 +908,39 @@
         <div class="notification-container" id="qr-notification-container"></div>
     </div>
 
+    <!-- Text Replacer Page -->
+    <div id="text-replacement-app" class="page">
+        <div class="container">
+            <h2>Text Replacer</h2>
+            <label id="fileInputLabel" for="text-replacer-file-input">Choose TXT File</label>
+            <input type="file" id="text-replacer-file-input" accept=".txt" style="display: none;">
+            <label>Main Text: <textarea id="text-replacer-main-text" autocomplete="off" placeholder="Enter your text here..."></textarea></label>
+            <div class="input-group">
+                <input type="text" id="text-replacer-original" placeholder="Text to replace">
+                <input type="text" id="text-replacer-replacement" placeholder="Replacement text">
+            </div>
+            <div class="case-sensitive">
+                <label>
+                    <input type="checkbox" id="text-replacer-case-sensitive" checked>
+                    Case Sensitive
+                </label>
+            </div>
+            <div class="output-heading">Result</div>
+            <pre id="text-replacer-output"></pre>
+        </div>
+        <div class="toolbar">
+            <button onclick="applyTextChanges()">
+                <i class="fa-regular fa-circle-check"></i>
+                Apply
+            </button>
+            <button onclick="saveReplacedText()">
+                <i class="fas fa-download"></i>
+                Save
+            </button>
+        </div>
+        <div class="notification-container" id="text-replacer-notification-container"></div>
+    </div>
+    
     <script>
         // Initialize the home page as active when the document loads
         document.addEventListener('DOMContentLoaded', function() {
@@ -1378,94 +1408,6 @@
             showNotification("Inputs cleared!", "base64-notification-container", "info");
         }
 
-        // Text Replacement App Script
-        function escapeRegExp(string) {
-            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        }
-        function renameText() {
-            // Store currently focused element
-            const activeElement = document.activeElement;
-            
-            let inputContainer = document.getElementById("inputContainer");
-            let searchText = document.getElementById("searchText").value;
-            let replaceText = document.getElementById("replaceText").value;
-            let outputDiv = document.getElementById("outputText");
-            
-            // Get raw text without HTML tags for processing
-            let rawText = inputContainer.innerText;
-            
-            if (searchText) {
-                let escapedSearchText = escapeRegExp(searchText);
-                let regex = new RegExp(escapedSearchText, 'gi');
-                
-                // Process highlighted text
-                let highlightedText = rawText.replace(regex, match => `<span class='highlight'>${match}</span>`);
-                let replacedText = rawText.replace(regex, replaceText);
-                
-                // Update containers while preserving cursor position
-                preserveCursorPosition(inputContainer, () => {
-                    inputContainer.innerHTML = highlightedText;
-                });
-                outputDiv.textContent = replacedText;
-            } else {
-                preserveCursorPosition(inputContainer, () => {
-                    inputContainer.innerHTML = rawText;
-                });
-                outputDiv.textContent = rawText;
-            }
-            
-            // Restore focus to original element if it was a search input
-            if (activeElement && (activeElement.id === 'searchText' || activeElement.id === 'replaceText')) {
-                activeElement.focus();
-            }
-        }
-
-        function restoreSelection(element, startOffset, endOffset) {
-            const range = document.createRange();
-            const sel = window.getSelection();
-            range.setStart(element.firstChild || element, startOffset);
-            range.setEnd(element.firstChild || element, endOffset);
-            sel.removeAllRanges();
-            sel.addRange(range);
-        }
-
-        function preserveCursorPosition(editableDiv, callback) {
-            const selection = window.getSelection();
-            const range = selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
-            const startOffset = range ? range.startOffset : 0;
-            const endOffset = range ? range.endOffset : 0;
-            
-            callback();
-            
-            if (range) {
-                const newRange = document.createRange();
-                const textNode = editableDiv.childNodes[0] || document.createTextNode('');
-                newRange.setStart(textNode, Math.min(startOffset, textNode.length));
-                newRange.setEnd(textNode, Math.min(endOffset, textNode.length));
-                selection.removeAllRanges();
-                selection.addRange(newRange);
-            }
-        }
-
-        function copyReplacementOutput() {
-            let output = document.getElementById('outputText').textContent;
-            if (output) {
-                navigator.clipboard.writeText(output)
-                    .then(() => showNotification("Output copied!", "replacement-notification-container", "success"))
-                    .catch(() => showNotification("Failed to copy", "replacement-notification-container", "error"));
-            } else {
-                showNotification("No output to copy", "replacement-notification-container", "error");
-            }
-        }
-
-        function clearReplacementInputs() {
-            document.getElementById('inputContainer').innerHTML = '';
-            document.getElementById('outputText').innerHTML = '';
-            document.getElementById('searchText').value = '';
-            document.getElementById('replaceText').value = '';
-            showNotification("Cleared all inputs", "replacement-notification-container", "info");
-        }
-
         // QR Code Generator Script
         let qrCodeInstance = null;
 
@@ -1516,6 +1458,75 @@
             }
             showNotification("Input cleared", "qr-notification-container", "info");
         }
+
+        //Text Replacer Function
+        function escapeHTML(str) {
+            return str.replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#039;");
+        }
+
+        function replaceText() {
+            const mainText = document.getElementById('text-replacer-main-text').value;
+            const original = document.getElementById('text-replacer-original').value;
+            const replacement = document.getElementById('text-replacer-replacement').value;
+            const caseSensitive = document.getElementById('text-replacer-case-sensitive').checked;
+            const outputDiv = document.getElementById('text-replacer-output');
+
+            if (!original) {
+                outputDiv.innerHTML = escapeHTML(mainText);
+                return;
+            }
+
+            const escapedOriginal = original.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const flags = caseSensitive ? 'g' : 'gi';
+            const regex = new RegExp(escapedOriginal, flags);
+            const newText = escapeHTML(mainText).replace(regex, match => 
+                `<span class="highlight">${escapeHTML(replacement)}</span>`
+            );
+
+            outputDiv.innerHTML = newText;
+        }
+
+        function applyTextChanges() {
+            const outputText = document.getElementById('text-replacer-output').innerText;
+            document.getElementById('text-replacer-main-text').value = outputText;
+            replaceText();
+            showNotification("Changes applied successfully!", "text-replacer-notification-container", "success");
+        }
+
+        function saveReplacedText() {
+            const text = document.getElementById('text-replacer-main-text').value;
+            const blob = new Blob([text], { type: 'text/plain' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'modified_text.txt';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showNotification("File saved successfully!", "text-replacer-notification-container", "success");
+        }
+
+        // Event Listeners for Text Replacer
+        document.getElementById('text-replacer-main-text').addEventListener('input', replaceText);
+        document.getElementById('text-replacer-original').addEventListener('input', replaceText);
+        document.getElementById('text-replacer-replacement').addEventListener('input', replaceText);
+        document.getElementById('text-replacer-case-sensitive').addEventListener('change', replaceText);
+
+        document.getElementById('text-replacer-file-input').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('text-replacer-main-text').value = e.target.result;
+                    replaceText();
+                    showNotification("File loaded successfully!", "text-replacer-notification-container", "success");
+                };
+                reader.readAsText(file);
+            }
+        });
 
         // Notification Function
         // Modified the showNotification function to include the progress bar
