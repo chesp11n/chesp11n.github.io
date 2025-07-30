@@ -20,6 +20,9 @@
             justify-content: center;
             align-items: center;
             overflow: hidden;
+            user-select: none;
+            -webkit-user-drag: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .carousel-container {
@@ -140,8 +143,11 @@
         }
 
         .current-title {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
             font-size: 2.5rem;
-            text-align: center;
             margin-top: 10px;
             font-weight: bold;
             text-transform: uppercase;
@@ -149,6 +155,14 @@
             height: 3rem;
             opacity: 1;
             transition: opacity 0.4s ease;
+        }
+
+        .title-logo {
+            height: 3rem;
+            width: auto;
+            object-fit: contain;
+            pointer-events: none;
+            user-select: none;
         }
 
         .error-placeholder {
@@ -161,6 +175,22 @@
             color: #666;
             border-radius: 8px;
             font-size: 1.2rem;
+        }
+
+        .ambient-glow {
+            position: absolute;
+            justify-content: center; /* Centers horizontally */
+            align-items: center;
+            transform: translateY(-13%);
+            width: 23%;
+            height: 700px;
+            background-color: rgba(0, 255, 255, 0.3); /* will transition */
+            mask-image: radial-gradient(ellipse at center, black 0%, transparent 70%);
+            -webkit-mask-image: radial-gradient(ellipse at center, black 0%, transparent 70%);
+            filter: blur(100px);
+            z-index: 0;
+            pointer-events: none;
+            transition: background-color 0.8s ease;
         }
 
         @media (max-width: 768px) {
@@ -176,6 +206,9 @@
             .current-title {
                 font-size: 2rem;
             }
+            .ambient-glow {
+                width: 70%;
+            }
         }
 
         /* Glow */
@@ -188,22 +221,6 @@
                 opacity: 1;
                 transform: translateX(-50%) scale(1.05);
             }
-        }
-
-        .ambient-glow {
-            position: absolute;
-            top: -300px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100%;
-            height: 700px;
-            background-color: rgba(0, 255, 255, 0.3); /* will transition */
-            mask-image: radial-gradient(ellipse at center, black 0%, transparent 70%);
-            -webkit-mask-image: radial-gradient(ellipse at center, black 0%, transparent 70%);
-            filter: blur(100px);
-            z-index: 0;
-            pointer-events: none;
-            transition: background-color 0.8s ease;
         }
     </style>
 </head>
@@ -225,16 +242,16 @@
     <script>
         // Image data
         const images = [
-            { url: 'ACCEL.png', title: 'ACCEL', glowColor: 'rgba(255, 68, 0, 0.3)' },
-            { url: 'CYCLONE.png', title: 'CYCLONE', glowColor: 'rgba(0, 255, 0, 0.3)' },
-            { url: 'ETERNAL.png', title: 'ETERNAL', glowColor: 'rgba(120, 203, 255, 0.3)' },
-            { url: 'FANG.png', title: 'FANG', glowColor: 'rgba(158, 255, 255, 0.3)' },
-            { url: 'HEAT.png', title: 'HEAT', glowColor: 'rgba(240, 7, 7, 0.3)' },
-            { url: 'JOKER.png', title: 'JOKER', glowColor: 'rgba(200, 0, 255, 0.3)' },
-            { url: 'LUNA.png', title: 'LUNA', glowColor: 'rgba(251, 255, 0, 0.3)' },
-            { url: 'METAL.png', title: 'METAL', glowColor: 'rgba(161, 161, 161, 0.3)' },
-            { url: 'SKULL.png', title: 'SKULL', glowColor: 'rgba(144, 0, 255, 0.3)' },
-            { url: 'TRIGGER.png', title: 'TRIGGER', glowColor: 'rgba(31, 143, 255, 0.3)' },
+            { url: 'ACCEL.png', title: 'ACCEL', glowColor: 'rgba(255, 68, 0, 0.3)', logo: 'ACCEL-logo.png' },
+            { url: 'CYCLONE.png', title: 'CYCLONE', glowColor: 'rgba(0, 255, 0, 0.3)', logo: 'CYCLONE-logo.png' },
+            { url: 'ETERNAL.png', title: 'ETERNAL', glowColor: 'rgba(120, 203, 255, 0.3)', logo: 'ETERNAL-logo.png' },
+            { url: 'FANG.png', title: 'FANG', glowColor: 'rgba(158, 255, 255, 0.3)', logo: 'FANG-logo.png' },
+            { url: 'HEAT.png', title: 'HEAT', glowColor: 'rgba(240, 7, 7, 0.3)', logo: 'HEAT-logo.png' },
+            { url: 'JOKER.png', title: 'JOKER', glowColor: 'rgba(200, 0, 255, 0.3)', logo: 'JOKER-logo.png' },
+            { url: 'LUNA.png', title: 'LUNA', glowColor: 'rgba(251, 255, 0, 0.3)', logo: 'LUNA-logo.png' },
+            { url: 'METAL.png', title: 'METAL', glowColor: 'rgba(161, 161, 161, 0.3)', logo: 'METAL-logo.png' },
+            { url: 'SKULL.png', title: 'SKULL', glowColor: 'rgba(144, 0, 255, 0.3)', logo: 'SKULL-logo.png' },
+            { url: 'TRIGGER.png', title: 'TRIGGER', glowColor: 'rgba(31, 143, 255, 0.3)', logo: 'TRIGGER-logo.png' },
         ];
 
         // DOM elements
@@ -309,7 +326,10 @@
 
             // After fade-out, update text and fade back in
             setTimeout(() => {
-                currentTitle.textContent = images[currentIndex].title;
+                currentTitle.innerHTML = `
+                    <img src="${images[currentIndex].logo}" alt="${images[currentIndex].title} logo" class="title-logo">
+                    <span>${images[currentIndex].title}</span>
+                `;
                 currentTitle.style.opacity = 1;
             }, 200); // Wait slightly less than the CSS transition time
 
@@ -348,7 +368,7 @@
             startX = e.touches[0].clientX;
         }, { passive: true });
 
-        const swipeThreshold = 100; // Increase from 50 to 100 or more
+        const swipeThreshold = 80; // Increase from 50 to 100 or more
 
         carousel.addEventListener('touchmove', (e) => {
             const diff = e.touches[0].clientX - startX;
