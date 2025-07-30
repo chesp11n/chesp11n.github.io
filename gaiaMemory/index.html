@@ -348,12 +348,14 @@
             startX = e.touches[0].clientX;
         }, { passive: true });
 
+        const swipeThreshold = 100; // Increase from 50 to 100 or more
+
         carousel.addEventListener('touchmove', (e) => {
             const diff = e.touches[0].clientX - startX;
-            if (Math.abs(diff) > 50) {
+            if (Math.abs(diff) > swipeThreshold) {
                 if (diff > 0) prevSlide();
                 else nextSlide();
-                startX = e.touches[0].clientX; // reset to prevent rapid firing
+                startX = e.touches[0].clientX; // Reset to prevent multiple swipes
             }
         });
 
