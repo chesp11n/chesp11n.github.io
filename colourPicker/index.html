@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Advanced Color Picker</title>
+    <title>Color Picker</title>
     <style>
         :root {
             --border-color: #ddd;
@@ -111,7 +111,7 @@
             pointer-events: none;
             z-index: 10;
         }
-        
+    
         .output {
             margin-top: 25px;
         }
@@ -120,7 +120,6 @@
             width: 100%;
             height: 60px;
             border-radius: 8px;
-            border: 1px solid var(--border-color);
             margin-bottom: 15px;
             box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
         }
@@ -255,7 +254,6 @@
 
         #colorInputBtn:hover {
             background-color: #0056b3;
-            transform: scale(1.05);
         }
 
         /* New styles for input mode toggle */
@@ -263,7 +261,7 @@
             display: flex;
             border-radius: 6px 6px 0px 0px;
             overflow: hidden;
-            background-color: #f5f5f5;
+            background-color: #dadada;
         }
 
         .input-mode-btn {
@@ -279,7 +277,7 @@
         }
 
         .input-mode-btn:hover {
-            background-color: #dadada;
+            background-color: #a5a5a5;
         }
 
         .input-mode-btn.active {
@@ -289,7 +287,6 @@
 
         .color-harmonies-group {
             background-color: #f5f5f5;
-            padding: 10px;
             border-radius: 6px;
             margin-bottom: 15px;
         }
@@ -309,20 +306,20 @@
         .color-harmonies {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
-            gap: 10px;
             margin-top: 10px;
+            border-radius: 0px 0px 6px 6px;
+            overflow: hidden;
         }
 
         .harmony-swatch {
-            border-radius: 6px;
-            padding: 10px;
+            padding-top: 10px;
+            padding-bottom: 10px;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            font-size: 12px;
             color: #fff;
             text-align: center;
             transition: transform 0.2s ease;
-            font-weight: 500;
-            font-size: 14px;
+            font-weight: 650;
+            font-size: 12px;
         }
 
         .harmony-label {
@@ -374,22 +371,22 @@
             
                 <div class="output">
                     <div class="color-preview" id="colorPreview"></div>
+
+                    <div class="nearest-color" id="nearestColor">
+                        <span class="nearest-color-text">Nearest to</span>
+                        <span class="nearest-color-name" id="nearestColorName">Red</span>
+                        <span class="nearest-color-hex" id="nearestColorHex">#FF0000</span>
+                    </div>
                     
                     <div class="input-mode-toggle">
                         <button class="input-mode-btn active" id="hexModeBtn">HEX</button>
                         <button class="input-mode-btn" id="rgbModeBtn">RGB</button>
                         <button class="input-mode-btn" id="cmykModeBtn">CMYK</button>
                     </div>
-                    
+
                     <div class="color-input-group">
                         <input type="text" id="colorInput" placeholder="Enter HEX color (e.g. #FF0000 or FF0000)">
                         <button id="colorInputBtn">Enter</button>
-                    </div>
-                    
-                    <div class="nearest-color" id="nearestColor">
-                        <span class="nearest-color-text">Nearest to</span>
-                        <span class="nearest-color-name" id="nearestColorName">Red</span>
-                        <span class="nearest-color-hex" id="nearestColorHex">#FF0000</span>
                     </div>
                     
                     <div class="color-codes">
@@ -414,6 +411,19 @@
                             <span class="code-value" id="cmykCode">0%, 100%, 100%, 0%</span>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <!-- New Variations Section -->
+            <div class="color-harmonies-container">
+                <h1>Variations</h1>
+                <div class="color-harmonies-group">
+                    <span class="color-harmonies-title">Tints</span>
+                    <div class="color-harmonies" id="Tints"></div>
+                </div>
+                <div class="color-harmonies-group">
+                    <span class="color-harmonies-title">Shades</span>
+                    <div class="color-harmonies" id="Shades"></div>
                 </div>
             </div>
 
@@ -1038,6 +1048,44 @@
                 { label: "+75°", hex: rgbToHex(...hsvToRgb((hue + 75) % 360, s, v)), hue: (hue + 75) % 360 }
             ];
         }
+
+        // Generate tints (mix with white)
+        function getTints(hexColor) {
+            const [r, g, b] = hexToRgb(hexColor);
+            const tints = [];
+            
+            for (let i = 10; i <= 90; i += 10) {
+                const ratio = i / 100;
+                const tintR = Math.round(r + (255 - r) * ratio);
+                const tintG = Math.round(g + (255 - g) * ratio);
+                const tintB = Math.round(b + (255 - b) * ratio);
+                tints.push({
+                    label: `${i}% White`,
+                    hex: rgbToHex(tintR, tintG, tintB)
+                });
+            }
+            
+            return tints;
+        }
+
+        // Generate shades (mix with black)
+        function getShades(hexColor) {
+            const [r, g, b] = hexToRgb(hexColor);
+            const shades = [];
+            
+            for (let i = 10; i <= 90; i += 10) {
+                const ratio = i / 100;
+                const shadeR = Math.round(r * (1 - ratio));
+                const shadeG = Math.round(g * (1 - ratio));
+                const shadeB = Math.round(b * (1 - ratio));
+                shades.push({
+                    label: `${i}% Black`,
+                    hex: rgbToHex(shadeR, shadeG, shadeB)
+                });
+            }
+            
+            return shades;
+        }
         
         // Update color display and codes
         function updateColor() {
@@ -1073,11 +1121,52 @@
             const hueThumbColor = `hsl(${hue}, 100%, 50%)`;
             hueSlider.style.setProperty('--thumb-color', hueThumbColor);
 
+            // Update all color variations and harmonies
+            updateTints();
+            updateShades();
             updateTriadicHarmonies();
             updateComplementaryHarmonies();
             updateTetradicHarmonies();
             updateAnalogousHarmonies();
             updateNeutralHarmonies();
+        }
+
+        function updateTints() {
+            const container = document.getElementById('Tints');
+            container.innerHTML = '';
+
+            const currentHex = rgbToHex(...hsvToRgb(hue, saturation, value));
+            const tints = getTints(currentHex);
+
+            tints.forEach(({ label, hex }) => {
+                const swatch = document.createElement('div');
+                swatch.className = 'harmony-swatch';
+                swatch.style.backgroundColor = hex;
+                swatch.style.color = getContrastColor(hex);
+                swatch.textContent = hex;
+                swatch.title = label; // Show label on hover
+                
+                container.appendChild(swatch);
+            });
+        }
+
+        function updateShades() {
+            const container = document.getElementById('Shades');
+            container.innerHTML = '';
+
+            const currentHex = rgbToHex(...hsvToRgb(hue, saturation, value));
+            const shades = getShades(currentHex);
+
+            shades.forEach(({ label, hex }) => {
+                const swatch = document.createElement('div');
+                swatch.className = 'harmony-swatch';
+                swatch.style.backgroundColor = hex;
+                swatch.style.color = getContrastColor(hex);
+                swatch.textContent = hex;
+                swatch.title = label; // Show label on hover
+                
+                container.appendChild(swatch);
+            });
         }
 
         function updateTriadicHarmonies() {
