@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Drawing Canvas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        
+        body {
+            background-color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background-color: white;
+            border-radius: 5px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .subtitle {
+            font-size: 1rem;
+            color: #666;
+        }
+        
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-radius: 5px;
+            justify-content: center;
+        }
+        
+        .tool-group {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+        
+        button {
+            padding: 8px 15px;
+            border: 1px solid #333;
+            border-radius: 3px;
+            background-color: white;
+            color: black;
+            cursor: pointer;
+            font-weight: normal;
+        }
+        
+        button.active {
+            background-color: #333;
+            color: white;
+        }
+        
+        input[type="color"] {
+            width: 40px;
+            height: 40px;
+            border: 1px solid #333;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        
+        input[type="range"] {
+            width: 120px;
+        }
+        
+        .canvas-container {
+            background-color: white;
+            border-radius: 5px;
+            overflow: hidden;
+            border: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        
+        canvas {
+            display: block;
+            cursor: crosshair;
+        }
+        
+        .instructions {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        @media (max-width: 600px) {
+            .toolbar {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .tool-group {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Simple Drawing Canvas</h1>
+            <p class="subtitle">Draw anything you like with the tools below</p>
+        </header>
+        
+        <div class="toolbar">
+            <div class="tool-group">
+                <button id="pen-tool" class="active">Pen</button>
+                <button id="eraser-tool">Eraser</button>
+            </div>
+            
+            <div class="tool-group">
+                <label>Color:</label>
+                <input type="color" id="color-picker" value="#000000">
+            </div>
+            
+            <div class="tool-group">
+                <label>Size:</label>
+                <input type="range" id="brush-size" min="1" max="50" value="5">
+                <span id="size-display">5px</span>
+            </div>
+            
+            <div class="tool-group">
+                <button id="clear-btn">Clear Canvas</button>
+                <button id="save-btn">Save Drawing</button>
+            </div>
+        </div>
+        
+        <div class="canvas-container">
+            <canvas id="drawing-canvas" width="800" height="500"></canvas>
+        </div>
+        
+        <p class="instructions">Click and drag on the canvas to draw. Use the toolbar to change tools and settings.</p>
+    </div>
+
+    <script>
+        // Get canvas and context
+        const canvas = document.getElementById('drawing-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Set initial canvas background to white
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Drawing state
+        let isDrawing = false;
+        let lastX = 0;
+        let lastY = 0;
+        let currentTool = 'pen';
+        let currentColor = '#000000';
+        let brushSize = 5;
+        
+        // Get DOM elements
+        const penTool = document.getElementById('pen-tool');
+        const eraserTool = document.getElementById('eraser-tool');
+        const colorPicker = document.getElementById('color-picker');
+        const brushSizeSlider = document.getElementById('brush-size');
+        const sizeDisplay = document.getElementById('size-display');
+        const clearBtn = document.getElementById('clear-btn');
+        const saveBtn = document.getElementById('save-btn');
+        
+        // Event listeners for drawing
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mouseout', stopDrawing);
+        
+        // Touch events for mobile devices
+        canvas.addEventListener('touchstart', handleTouchStart);
+        canvas.addEventListener('touchmove', handleTouchMove);
+        canvas.addEventListener('touchend', stopDrawing);
+        
+        // Tool selection
+        penTool.addEventListener('click', () => {
+            setActiveTool('pen');
+        });
+        
+        eraserTool.addEventListener('click', () => {
+            setActiveTool('eraser');
+        });
+        
+        // Color and size controls
+        colorPicker.addEventListener('input', (e) => {
+            currentColor = e.target.value;
+        });
+        
+        brushSizeSlider.addEventListener('input', (e) => {
+            brushSize = e.target.value;
+            sizeDisplay.textContent = `${brushSize}px`;
+        });
+        
+        // Clear and save buttons
+        clearBtn.addEventListener('click', clearCanvas);
+        saveBtn.addEventListener('click', saveDrawing);
+        
+        // Drawing functions
+        function startDrawing(e) {
+            isDrawing = true;
+            [lastX, lastY] = getCoordinates(e);
+        }
+        
+        function draw(e) {
+            if (!isDrawing) return;
+            
+            e.preventDefault();
+            
+            const [x, y] = getCoordinates(e);
+            
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(x, y);
+            
+            if (currentTool === 'pen') {
+                ctx.strokeStyle = currentColor;
+            } else if (currentTool === 'eraser') {
+                ctx.strokeStyle = 'white';
+            }
+            
+            ctx.lineWidth = brushSize;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.stroke();
+            
+            [lastX, lastY] = [x, y];
+        }
+        
+        function stopDrawing() {
+            isDrawing = false;
+        }
+        
+        // Touch event handlers
+        function handleTouchStart(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            startDrawing(touch);
+        }
+        
+        function handleTouchMove(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            draw(touch);
+        }
+        
+        // Helper functions
+        function getCoordinates(e) {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            
+            let clientX, clientY;
+            
+            if (e.type.includes('touch')) {
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+            } else {
+                clientX = e.clientX;
+                clientY = e.clientY;
+            }
+            
+            return [
+                (clientX - rect.left) * scaleX,
+                (clientY - rect.top) * scaleY
+            ];
+        }
+        
+        function setActiveTool(tool) {
+            currentTool = tool;
+            
+            // Update button states
+            penTool.classList.toggle('active', tool === 'pen');
+            eraserTool.classList.toggle('active', tool === 'eraser');
+        }
+        
+        function clearCanvas() {
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+        
+        function saveDrawing() {
+            const link = document.createElement('a');
+            link.download = 'my-drawing.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+    </script>
+</body>
+</html>
