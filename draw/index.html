@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Drawing Canvas</title>
+    <title>Drawing Canvas</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
         body {
@@ -19,6 +19,7 @@
             align-items: center;
             padding: 20px;
             color: #333;
+            min-height: 100vh;
         }
         
         .container {
@@ -96,11 +97,14 @@
             overflow: hidden;
             border: 1px solid #ddd;
             margin-bottom: 20px;
+            touch-action: none; /* Important for touch devices */
         }
         
         canvas {
             display: block;
             cursor: crosshair;
+            width: 100%;
+            height: auto;
         }
         
         .instructions {
@@ -124,14 +128,18 @@
             h1 {
                 font-size: 1.5rem;
             }
+            
+            .container {
+                padding: 10px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>Simple Drawing Canvas</h1>
-            <p class="subtitle">Draw anything you like with the tools below</p>
+            <h1>Drawing Canvas</h1>
+            <p class="subtitle">Draw with your mouse or touch</p>
         </header>
         
         <div class="toolbar">
@@ -158,16 +166,27 @@
         </div>
         
         <div class="canvas-container">
-            <canvas id="drawing-canvas" width="800" height="500"></canvas>
+            <canvas id="drawing-canvas"></canvas>
         </div>
         
-        <p class="instructions">Click and drag on the canvas to draw. Use the toolbar to change tools and settings.</p>
+        <p class="instructions">Click/touch and drag on the canvas to draw. Use the toolbar to change tools and settings.</p>
     </div>
 
     <script>
         // Get canvas and context
         const canvas = document.getElementById('drawing-canvas');
         const ctx = canvas.getContext('2d');
+        
+        // Set canvas dimensions
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            canvas.width = container.clientWidth;
+            canvas.height = Math.min(container.clientWidth * 0.6, 500); // Maintain aspect ratio
+        }
+        
+        // Initial resize
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
         
         // Set initial canvas background to white
         ctx.fillStyle = 'white';
@@ -190,16 +209,17 @@
         const clearBtn = document.getElementById('clear-btn');
         const saveBtn = document.getElementById('save-btn');
         
-        // Event listeners for drawing
+        // Mouse event listeners for drawing
         canvas.addEventListener('mousedown', startDrawing);
         canvas.addEventListener('mousemove', draw);
         canvas.addEventListener('mouseup', stopDrawing);
         canvas.addEventListener('mouseout', stopDrawing);
         
-        // Touch events for mobile devices
-        canvas.addEventListener('touchstart', handleTouchStart);
-        canvas.addEventListener('touchmove', handleTouchMove);
+        // Touch event listeners for drawing
+        canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+        canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
         canvas.addEventListener('touchend', stopDrawing);
+        canvas.addEventListener('touchcancel', stopDrawing);
         
         // Tool selection
         penTool.addEventListener('click', () => {
@@ -262,14 +282,18 @@
         // Touch event handlers
         function handleTouchStart(e) {
             e.preventDefault();
-            const touch = e.touches[0];
-            startDrawing(touch);
+            if (e.touches.length === 1) {
+                const touch = e.touches[0];
+                startDrawing(touch);
+            }
         }
         
         function handleTouchMove(e) {
             e.preventDefault();
-            const touch = e.touches[0];
-            draw(touch);
+            if (e.touches.length === 1) {
+                const touch = e.touches[0];
+                draw(touch);
+            }
         }
         
         // Helper functions
